@@ -248,7 +248,6 @@
     <ClCompile Include="BigBang\visitor.cpp" />
     <ClCompile Include="Graphics\colorspace_convertion.cpp" />
     <ClCompile Include="D-Arc.cxx" />
-    <ClCompile Include="UnitTest.cpp" />
     <ClCompile Include="WormHole\mbtest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -262,7 +261,6 @@
     <ClInclude Include="BigBang\cyberspace.hpp" />
     <ClInclude Include="BigBang\visitor.hpp" />
     <ClInclude Include="configuration.hpp" />
-    <ClInclude Include="Graphics\colorspace_convertion.hpp" />
     <ClInclude Include="WormHole\mbtest.hpp" />
   </ItemGroup>
   <ItemGroup>

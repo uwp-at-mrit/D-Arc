@@ -2,6 +2,7 @@
 #include "syslog.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::Tamer;
 
 static const uint16 ninbit      = 0x16;
 
@@ -12,6 +13,7 @@ static uint16 inregisters_src[] = { 0x0A };
 static IModbusServer* server = nullptr;
 static IModbusClient* client = nullptr;
 
+/*************************************************************************************************/
 class BConfirmation : public ModbusConfirmation {
 public:
 	void on_discrete_inputs(uint16 transaction, uint16 address, uint8* status, uint8 count, Syslog* logger) override {
@@ -45,7 +47,8 @@ public:
 	}
 };
 
-IModbusServer* make_modbus_test_server(Syslog* logger) {
+/*************************************************************************************************/
+IModbusServer* WarGrey::Tamer::make_modbus_test_server(Syslog* logger) {
 	uint8 ninregister = sizeof(inregisters_src) / sizeof(uint16);
 	auto device = new ModbusVirtualDevice(logger, 0x130, 0x25, 0x1C4, ninbit, 0x160, 0x20, 0x108, ninregister);
 	
@@ -55,11 +58,11 @@ IModbusServer* make_modbus_test_server(Syslog* logger) {
 	return device;
 }
 
-IModbusClient* make_modbus_test_client(Syslog* logger, Platform::String^ device, IModbusConfirmation* confirmation) {
+IModbusClient* WarGrey::Tamer::make_modbus_test_client(Syslog* logger, Platform::String^ device, IModbusConfirmation* confirmation) {
 	return new ModbusClient(logger, device, confirmation);
 }
 
-void modbus_test_client(Platform::String^ device, Syslog* logger) {
+void WarGrey::Tamer::modbus_test_client(Platform::String^ device, Syslog* logger) {
 	if (client == nullptr) {
 		auto confirmation = new BConfirmation();
 		
@@ -78,7 +81,7 @@ void modbus_test_client(Platform::String^ device, Syslog* logger) {
 	client->write_read_registers(0x160 + 1, regsize - 1, 0x160, regsize, registers);
 }
 
-void modbus_test_server(Syslog* logger) {
+void WarGrey::Tamer::modbus_test_server(Syslog* logger) {
 	if (server == nullptr) {
 		server = make_modbus_test_server(logger);
 		server->listen();

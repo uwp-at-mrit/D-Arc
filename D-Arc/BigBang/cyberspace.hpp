@@ -3,7 +3,7 @@
 #include "planet.hpp"
 #include "graphlet/ui/textlet.hpp"
 
-namespace WarGrey::SCADA {
+namespace WarGrey::Tamer {
 	private class CyberSpace : public WarGrey::SCADA::Planet {
 	public:
 		virtual ~CyberSpace() noexcept;

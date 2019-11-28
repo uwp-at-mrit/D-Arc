@@ -7,6 +7,7 @@
 #include "datum/string.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::Tamer;
 
 using namespace Microsoft::Graphics::Canvas;
 using namespace Microsoft::Graphics::Canvas::UI;

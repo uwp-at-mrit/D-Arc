@@ -9,6 +9,7 @@
 #include "BigBang/visitor.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::Tamer;
 
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
@@ -18,13 +19,14 @@ using namespace Windows::System;
 using namespace Windows::Foundation;
 
 using namespace Windows::UI::Input;
-
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Controls;
 
 using namespace Microsoft::Graphics::Canvas;
 using namespace Microsoft::Graphics::Canvas::UI;
+
+using namespace Microsoft::VisualStudio::TestPlatform::TestExecutor::WinRTCore;
 
 /*************************************************************************************************/
 private ref class DArcUniverse : public UniverseDisplay {
@@ -84,6 +86,10 @@ public:
 			this->Pane = panel;
 			this->OpenPaneLength = this->universe->navigator->min_width();
 		}
+	}
+
+	void on_foreground_activated(Platform::String^ arguments) {
+		UnitTestClient::Run(arguments);
 	}
 	
 	void on_entered_background(EnteredBackgroundEventArgs^ args) {}

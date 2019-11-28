@@ -7,6 +7,7 @@
 #include "datum/flonum.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::Tamer;
 
 using namespace Windows::System;
 using namespace Windows::Devices::Input;

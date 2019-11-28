@@ -28,7 +28,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="UnitTest.cpp" />
     <ClCompile Include="BigBang\cyberspace.cpp">
       <Filter>BigBang</Filter>
     </ClCompile>
@@ -211,9 +210,6 @@
     </ClInclude>
     <ClInclude Include="BigBang\visitor.hpp">
       <Filter>BigBang</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\colorspace_convertion.hpp">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="WormHole\mbtest.hpp">
       <Filter>WormHole</Filter>
