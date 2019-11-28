@@ -244,6 +244,7 @@
     <Image Include="Assets\Wide310x150Logo.scale-400.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Auxiliary\big_natural.cpp" />
     <ClCompile Include="BigBang\cyberspace.cpp" />
     <ClCompile Include="BigBang\visitor.cpp" />
     <ClCompile Include="Graphics\colorspace_convertion.cpp" />

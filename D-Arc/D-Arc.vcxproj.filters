@@ -26,6 +26,9 @@
     <Filter Include="WormHole">
       <UniqueIdentifier>{647f0004-66e5-4551-846e-5439c131c8e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Auxiliary">
+      <UniqueIdentifier>{bf8ea7bf-8b6a-4e73-bdea-bea1ec5c4d02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BigBang\cyberspace.cpp">
@@ -41,6 +44,9 @@
       <Filter>WormHole</Filter>
     </ClCompile>
     <ClCompile Include="D-Arc.cxx" />
+    <ClCompile Include="Auxiliary\big_natural.cpp">
+      <Filter>Auxiliary</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">

@@ -7,6 +7,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 using namespace Windows::UI;
 
+/*************************************************************************************************/
 static const unsigned char hue_idx = 3;
 static const unsigned char value_idx = 7;
 static const unsigned char lightness_idx = 8;
