@@ -7,3 +7,6 @@
 [submodule "BigBang"]
 	path = BigBang
 	url = https://github.com/uwp-at-mrit/BigBang.git
+[submodule "WormHole"]
+	path = WormHole
+	url = https://github.com/uwp-at-mrit/WormHole.git
