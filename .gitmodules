@@ -1,0 +1,9 @@
+[submodule "Auxiliary"]
+	path = Auxiliary
+	url = https://github.com/uwp-at-mrit/Auxiliary.git
+[submodule "Graphics"]
+	path = Graphics
+	url = https://github.com/uwp-at-mrit/Graphics.git
+[submodule "BigBang"]
+	path = BigBang
+	url = https://github.com/uwp-at-mrit/BigBang.git
