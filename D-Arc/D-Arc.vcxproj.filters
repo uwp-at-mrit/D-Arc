@@ -44,7 +44,7 @@
       <Filter>WormHole</Filter>
     </ClCompile>
     <ClCompile Include="D-Arc.cxx" />
-    <ClCompile Include="Auxiliary\big_natural.cpp">
+    <ClCompile Include="Auxiliary\mpint.cpp">
       <Filter>Auxiliary</Filter>
     </ClCompile>
   </ItemGroup>
