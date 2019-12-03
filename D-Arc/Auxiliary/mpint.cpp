@@ -74,10 +74,11 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 	private class Arithmetic : public TestClass<Arithmetic> {
 	public:
 		TEST_METHOD(Increment) {
-			Natural origin(0x123456789U);
-			Natural incremented = origin;
-
-			assert(origin, incremented, "increment");
+			test_increment(Natural(), "01", 1U);
+			test_increment(Natural(0x09), "0A", 4U);
+			test_increment(Natural(0xFF), "0100", 9U);
+			test_increment(Natural(0xFF01234567890ABCU), "FF01234567890ABD", 64U);
+			test_increment(Natural(0xFFFFFFFFFFFFFFFFU), "010000000000000000", 65U);
 		}
 
 	public:
@@ -96,10 +97,16 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 	private:
-		void test_addition(Natural& lhs, unsigned long long rhs, const char* representation, size_t bits) {
-			Platform::String^ message = make_wstring(L"(+ #x%S #x%X)", lhs.to_hexstring().c_str(), rhs);
+		void test_increment(Natural& n, const char* representation, size_t bits) {
+			n++;
 
-			assert(rhs + lhs, representation, bits, message);
+			assert(n, representation, bits,
+				make_wstring(L"#x%S++", n.to_hexstring().c_str()));
+		}
+		
+		void test_addition(Natural& lhs, unsigned long long rhs, const char* representation, size_t bits) {
+			assert(rhs + lhs, representation, bits,
+				make_wstring(L"(+ #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
 		}
 
 		void test_addition(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
