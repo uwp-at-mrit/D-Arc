@@ -92,8 +92,24 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 
 			test_addition(Natural(0x3), Natural(), "03", 2U);
 			test_addition(Natural(wch), Natural(wch), "ECA8642002468ACF13579BDE", 96U);
-			test_addition(Natural(ch), Natural(ch), "01FD9B7530ECA8642002468ACF13579BDE", 129U);
 			test_addition(Natural(ch), Natural(wch), "FECDBA98ECA8642002468ACF13579BDE", 128U);
+			test_addition(Natural(ch), Natural(ch), "01FD9B7530ECA8642002468ACF13579BDE", 129U);
+		}
+
+		TEST_METHOD(Multiplicaton) {
+			test_multiplication(Natural(0x1), 0x0U, "00", 0U);
+			test_multiplication(Natural(0x2), 0x113198824U, "0226331048", 34U);
+			test_multiplication(Natural(0x2718281828459045U), 0x3141592653589793U, "07859A6C0E1840504FE2128E1EC28A9F", 123U);
+			test_multiplication(Natural(0x6243299885435508U), 0x6601618158468695U, "27274A43072E41D0558E8232CEE2ADA8", 126U);
+			test_multiplication(Natural(0x7642236535892206U), 0x9159655941772190U, "4324C1DBF4B5587D2396DB4D214FE960", 127U);
+			test_multiplication(Natural(16, "161803398874989484820"), 0x1U, "0161803398874989484820", 81U);
+
+			test_multiplication(Natural(0x3), Natural(), "00", 0U);
+			test_multiplication(Natural(914), Natural(1), "0392", 10);
+			test_multiplication(Natural(914), Natural(84), "012BE8", 17);
+			test_multiplication(Natural(wch), Natural(wch), "36B1B9D7A5578492EA6324B6A6F7108CDCA5E20890F2A521", 190U);
+			test_multiplication(Natural(ch), Natural(wch), "75C6A1579D00FC474137A8FA8668109EA6F7108CDCA5E20890F2A521", 223U);
+			test_multiplication(Natural(ch), Natural(ch), "FD9CE39AEAFE7CEF03503EB6DD17CD62226CFC86A6F7108CDCA5E20890F2A521", 256U);
 		}
 
 	private:
@@ -117,6 +133,21 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			
 			assert(lhs + rhs, representation, bits, lhs_message);
 			assert(rhs + lhs, representation, bits, rhs_message);
+		}
+
+		void test_multiplication(Natural& lhs, unsigned long long rhs, const char* representation, size_t bits) {
+			assert(rhs * lhs, representation, bits,
+				make_wstring(L"(* #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
+		}
+
+		void test_multiplication(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
+			std::string lhex = lhs.to_hexstring();
+			std::string rhex = rhs.to_hexstring();
+			Platform::String^ lhs_message = make_wstring(L"(LR* #x%S #x%S)", lhex.c_str(), rhex.c_str());
+			Platform::String^ rhs_message = make_wstring(L"(RL* #x%S #x%S)", rhex.c_str(), lhex.c_str());
+
+			assert(lhs * rhs, representation, bits, lhs_message);
+			assert(rhs * lhs, representation, bits, rhs_message);
 		}
 	};
 }
