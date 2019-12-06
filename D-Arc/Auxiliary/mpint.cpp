@@ -27,8 +27,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 
 	static uint8 ch[] = { 0xFE, 0xCD, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
 	static uint16 wch[] = { 0x0000, 0x0000, 0x7654, 0x3210, 0x0123, 0x4567, 0x89AB, 0xCDEF };
-	static std::string base256 = "1234567890ABCDEF";
-
+	
 	private class Construction : public TestClass<Construction> {
 	public:
 		TEST_METHOD(Fixnum) {
@@ -42,13 +41,18 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		TEST_METHOD(Memory) {
+			static std::string M_ID = "10";
+			static std::string M_KEY = "10121";
+			static std::string HW_ID = "12345";
 			uint16* pwch = wch; // test the constructor dispatcher
 			size_t chsize = sizeof(ch);
 			size_t wchsize = sizeof(wch);
 
 			assert(Natural(ch),                   "FECDBA98765432100123456789ABCDEF", chsize, 128U, "Base256");
 			assert(Natural(pwch, 0, wchsize / 2), "765432100123456789ABCDEF",         12,     95U,  "Base512");
-			assert(Natural(base256),              "31323334353637383930414243444546", 16,     126U, "#F1234567890ABCDEF");
+			assert(Natural(M_ID),                 "3130",                             2,      14U,  "M_ID");
+			assert(Natural(M_KEY),                "3130313231",                       5,      38U,  "M_KEY");
+			assert(Natural(HW_ID),                "3132333435",                       5,      38U,  "HW_ID");
 			assert(Natural("ABCDEF"),             "4100420043004400450046",           11,     87U,  "#WABCDEF");
 		}
 
@@ -89,6 +93,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_addition(Natural(0x6243299885435508U), 0x6601618158468695U, "C8448B19DD89DB9D", 64U);
 			test_addition(Natural(0x7642236535892206U), 0x9159655941772190U, "01079B88BE77004396", 65U);
 			test_addition(Natural(16, "161803398874989484820"), 0x35323U, "01618033988749894B9B43", 81U);
+			test_addition(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539, "3006050FB7A76AC18302FB5B3891", 110U);
 
 			test_addition(Natural(0x3), Natural(), "03", 2U);
 			test_addition(Natural(wch), Natural(wch), "ECA8642002468ACF13579BDE", 96U);
@@ -110,6 +115,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_multiplication(Natural(wch), Natural(wch), "36B1B9D7A5578492EA6324B6A6F7108CDCA5E20890F2A521", 190U);
 			test_multiplication(Natural(ch), Natural(wch), "75C6A1579D00FC474137A8FA8668109EA6F7108CDCA5E20890F2A521", 223U);
 			test_multiplication(Natural(ch), Natural(ch), "FD9CE39AEAFE7CEF03503EB6DD17CD62226CFC86A6F7108CDCA5E20890F2A521", 256U);
+			test_multiplication(Natural(16, "3006050FB7A76AC18302FB593358"), Natural(16, "20539"), "6106D98FDE64FEDF92AB31451B8D2698", 127U);
 		}
 
 	private:

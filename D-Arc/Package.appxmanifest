@@ -7,7 +7,7 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="3ae32db0-b075-46cc-ac5e-c40ee67c1888"
+    Name="UWP-Arc-3ae32db0-b075-46cc-ac5e-c40ee67c1888"
     Publisher="CN=wargrey"
     Version="1.0.3.0" />
 

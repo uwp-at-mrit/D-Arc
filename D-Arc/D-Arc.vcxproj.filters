@@ -47,6 +47,9 @@
     <ClCompile Include="Auxiliary\mpint.cpp">
       <Filter>Auxiliary</Filter>
     </ClCompile>
+    <ClCompile Include="BigBang\IHOS63TDS.cpp">
+      <Filter>BigBang</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">
@@ -219,6 +222,9 @@
     </ClInclude>
     <ClInclude Include="WormHole\mbtest.hpp">
       <Filter>WormHole</Filter>
+    </ClInclude>
+    <ClInclude Include="BigBang\IHOS63TDS.hpp">
+      <Filter>BigBang</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

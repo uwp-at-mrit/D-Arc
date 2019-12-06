@@ -7,6 +7,7 @@
 #include "syslog.hpp"
 
 #include "BigBang/visitor.hpp"
+#include "BigBang/IHOS63TDS.hpp"
 
 using namespace WarGrey::SCADA;
 using namespace WarGrey::Tamer;
@@ -40,6 +41,7 @@ internal:
 
 protected:
 	void construct(CanvasCreateResourcesReason reason) override {
+		this->push_planet(new IHOS63TDS());
 		this->push_planet(new VisitorSpace());
 	}
 };
