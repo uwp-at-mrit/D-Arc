@@ -4,6 +4,7 @@
 #include "datum/string.hpp"
 
 using namespace WarGrey::SCADA;
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/

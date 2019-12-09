@@ -273,6 +273,8 @@
     <Image Include="Assets\Wide310x150Logo.scale-400.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Auxiliary\bfish.cpp" />
+    <ClCompile Include="Auxiliary\enc.cpp" />
     <ClCompile Include="Auxiliary\mpint.cpp" />
     <ClCompile Include="BigBang\cyberspace.cpp" />
     <ClCompile Include="BigBang\IHOS63TDS.cpp" />

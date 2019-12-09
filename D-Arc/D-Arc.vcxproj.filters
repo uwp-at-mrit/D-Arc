@@ -50,6 +50,12 @@
     <ClCompile Include="BigBang\IHOS63TDS.cpp">
       <Filter>BigBang</Filter>
     </ClCompile>
+    <ClCompile Include="Auxiliary\bfish.cpp">
+      <Filter>Auxiliary</Filter>
+    </ClCompile>
+    <ClCompile Include="Auxiliary\enc.cpp">
+      <Filter>Auxiliary</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">
