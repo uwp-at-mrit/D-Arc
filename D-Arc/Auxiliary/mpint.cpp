@@ -3,8 +3,6 @@
 #include "datum/natural.hpp"
 #include "datum/string.hpp"
 
-#include "syslog.hpp"
-
 using namespace WarGrey::SCADA;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -182,6 +180,23 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_multiplication(Natural(16, "3006050FB7A76AC18302FB593358"), Natural(16, "20539"), "6106D98FDE64FEDF92AB31451B8D2698", 127U);
 		}
 
+		TEST_METHOD(Shift) {
+			uint64 ns[] = { 0x0ULL, 0x5ULL, 0x1010ULL, 0xFE110ULL, 0xEC0000412ULL };
+
+			for (size_t idx = 0; idx < sizeof(ns) / sizeof(uint64); idx++) {
+				for (uint64 i = 0; i < 9; i++) {
+					Natural N(ns[idx] << i);
+					Natural n(ns[idx]);
+
+					n <<= i;
+					assert(n, N, make_wstring(L"%x << %d", ns[idx], i));
+				}
+			}
+
+			test_lshift(Natural(16, "6243299885435508"), 92, Natural(16, "0624329988543550800000000000000000000000"));
+			test_lshift(Natural(16, "2718281828459045"), 10, Natural(16, "9C60A060A116411400"));
+		}
+
 	private:
 		void test_increment(Natural& n, const char* representation, size_t bits) {
 			n++;
@@ -218,6 +233,13 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 
 			assert(lhs * rhs, representation, bits, lhs_message);
 			assert(rhs * lhs, representation, bits, rhs_message);
+		}
+
+		void test_lshift(Natural& lhs, uint64 rhs, Natural& r) {
+			bytes lhex = lhs.to_hexstring();
+			Platform::String^ message = make_wstring(L"(<< #x%S %u)", lhex.c_str(), rhs);
+
+			assert(lhs << rhs, r, message);
 		}
 	};
 }

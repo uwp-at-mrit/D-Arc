@@ -56,13 +56,12 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 
 			Assert::AreEqual(0x010203040501U, enc_hardware_uid6(0x0102030405U), L"HW_ID -> HW_ID6");
 			Assert::AreEqual("313233343831", (char*)enc_ascii(hw_id6, 6U).c_str(), L"HW_ID6 ASCII");
-			Assert::AreEqual(hw_bytes, (char*)enc_natural_bytes(hw_id6, 6U).c_str(), L"HW_ID6 Bytes");
 		}
 
 		TEST_METHOD(Encryption) {
 			uint64 hw_id = enc_hexadecimal_from_ascii("3132333438", 5U);
 			uint64 hw_id6 = enc_hardware_uid6(hw_id);
-			BlowfishCipher bf(enc_natural_bytes(hw_id6, 6U));
+			BlowfishCipher bf(hexnumber(hw_id6, 6U));
 			
 			this->test_encryption(&bf, 0xC1CB518E9CULL, 0xBEB9BFE3C7C6CE68ULL, "Encryption Cell Key 1");
 			this->test_encryption(&bf, 0x421571CC66ULL, 0xB16411FD09F96982ULL, "Encryption Cell Key 2");
