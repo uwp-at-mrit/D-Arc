@@ -76,31 +76,47 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 	};
 
-	private class NumberField : public TestClass<NumberField> {
+	private class Subscription : public TestClass<Subscription> {
 	public:
-		TEST_METHOD(Byte_Subscript) {
+		TEST_METHOD(Byte) {
 			Natural n(ch);
 			int nsize = int(n.length());
 
-			Assert::AreEqual((uint8)0U, Natural()[0], L"0[0] = 0");
-			Assert::AreEqual((uint8)0U, Natural()[1], L"0[1] = 0");
-			Assert::AreEqual((uint8)0U, Natural()[-1], L"0[-1] = 0");
-
-			for (int idx = 0; idx < nsize; idx++) {				
+			for (int idx = 0; idx < nsize; idx++) {
 				Assert::AreEqual(ch[idx], n[idx], make_wstring(L"n[%d] = %x", idx, ch[idx])->Data());
 				Assert::AreEqual(ch[idx], n[idx - nsize], make_wstring(L"n[%d] = %x", idx - nsize, ch[idx])->Data());
+				Assert::AreEqual((uintptr_t*)(&n[idx]), (uintptr_t*)(&n[idx - nsize]), make_wstring(L"localtion of n[%d]", idx)->Data());
 			}
 		}
 
-		TEST_METHOD(Fixnum_Subscript) {
+		TEST_METHOD(Modification) {
+			Natural zero;
+			Natural ff(0xFFFFFFFFFFFFFFFF);
+
+			zero[-1] = 1U;
+			ff[0xFF] = 1U;
+
+			Assert::AreEqual("00", (const char*)zero.to_hexstring().c_str(),  L"capacity > payload");
+			Assert::AreEqual("01FFFFFFFFFFFFFF", (const char*)ff.to_hexstring().c_str(),  L"capacity == playload");
+
+			Assert::IsTrue(zero[0] == zero[-1],  L"zero[0] == zero[-1]");
+			Assert::IsTrue(zero[-1] == zero[-2], L"zero[-1] == zero[-2]");
+			Assert::IsFalse(zero[1] == 0,  L"zero[1] != 0");
+
+			Assert::IsTrue(ff[0xFF] == ff[0],  L"ff[0xFF] == ff[0]");
+			Assert::IsFalse(ff[0] == 0xFF,  L"ff[0] has been changed");
+		}
+
+		TEST_METHOD(Fixnum) {
 			Natural xFECDBA0123456789(0xFECDBA0123456789U);
 			Natural n(wch);
+			Natural zero;
 			int size16 = int(n.fixnum_count(Fixnum::Uint16));
 			size_t idx16 = sizeof(wch) / sizeof(uint16) - size16;
 
-			Assert::AreEqual((uint64)0U, Natural().fixnum64_ref(0), L"0[0] = 0");
-			Assert::AreEqual((uint64)0U, Natural().fixnum64_ref(1), L"0[1] = 0");
-			Assert::AreEqual((uint64)0U, Natural().fixnum64_ref(-1), L"0[-1] = 0");
+			Assert::AreEqual((uint64)0U, zero.fixnum64_ref(0), L"0[0] = 0");
+			Assert::AreEqual((uint64)0U, zero.fixnum64_ref(1), L"0[1] = 0");
+			Assert::AreEqual((uint64)0U, zero.fixnum64_ref(-1), L"0[-1] = 0");
 
 			for (int idx = 0; idx < size16; idx++) {
 				const uint64 v = wch[idx + idx16];
