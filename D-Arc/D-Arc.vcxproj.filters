@@ -53,7 +53,7 @@
     <ClCompile Include="Auxiliary\bfish.cpp">
       <Filter>Auxiliary</Filter>
     </ClCompile>
-    <ClCompile Include="Auxiliary\enc.cpp">
+    <ClCompile Include="Auxiliary\permit.cpp">
       <Filter>Auxiliary</Filter>
     </ClCompile>
   </ItemGroup>

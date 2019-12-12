@@ -274,7 +274,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Auxiliary\bfish.cpp" />
-    <ClCompile Include="Auxiliary\enc.cpp" />
+    <ClCompile Include="Auxiliary\permit.cpp" />
     <ClCompile Include="Auxiliary\mpint.cpp" />
     <ClCompile Include="BigBang\cyberspace.cpp" />
     <ClCompile Include="BigBang\IHOS63TDS.cpp" />

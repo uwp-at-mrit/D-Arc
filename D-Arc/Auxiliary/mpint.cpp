@@ -10,18 +10,18 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 /*************************************************************************************************/
 namespace WarGrey::Tamer::Auxiliary::MPNatural {
 	static void assert(Natural& n, const char* representation, size_t size, size_t bits, Platform::String^ message) {
-		Assert::AreEqual(representation, n.to_hexstring().c_str(), message->Data());
+		Assert::AreEqual(representation, (const char*)n.to_hexstring().c_str(), message->Data());
 		Assert::AreEqual(size, n.length(), (message + "[size]")->Data());
 		Assert::AreEqual(bits, n.integer_length(), (message + "[bits]")->Data());
 	}
 
 	static void assert(Natural& n, const char* representation, size_t bits, Platform::String^ message) {
-		Assert::AreEqual(representation, n.to_hexstring().c_str(), message->Data());
+		Assert::AreEqual(representation, (const char*)n.to_hexstring().c_str(), message->Data());
 		Assert::AreEqual(bits, n.integer_length(), (message + "[bits]")->Data());
 	}
 
 	static void assert(Natural& n, Natural& control, Platform::String^ message) {
-		Assert::AreEqual(control.to_hexstring().c_str(), n.to_hexstring().c_str(), message->Data());
+		Assert::AreEqual((const char*)control.to_hexstring().c_str(), (const char*)n.to_hexstring().c_str(), message->Data());
 		Assert::AreEqual(control.length(), n.length(), (message + "[size]")->Data());
 		Assert::AreEqual(control.integer_length(), n.integer_length(), (message + "[bits]")->Data());
 	}
@@ -73,6 +73,44 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			assert(Natural(8, "00000567"),          "0177",         2, 9U,  "#o00000567");
 			assert(Natural(8, L"0123456776543210"), "053977FAC688", 6, 43U, "#o0123456776543210");
 			assert(Natural(8, L"7654321001234567"), "FAC688053977", 6, 48U, "#o7654321001234567");
+		}
+	};
+
+	private class NumberField : public TestClass<NumberField> {
+	public:
+		TEST_METHOD(Byte_Subscript) {
+			Natural n(ch);
+			int nsize = int(n.length());
+
+			Assert::AreEqual((uint8)0U, Natural()[0], L"0[0] = 0");
+			Assert::AreEqual((uint8)0U, Natural()[1], L"0[1] = 0");
+			Assert::AreEqual((uint8)0U, Natural()[-1], L"0[-1] = 0");
+
+			for (int idx = 0; idx < nsize; idx++) {				
+				Assert::AreEqual(ch[idx], n[idx], make_wstring(L"n[%d] = %x", idx, ch[idx])->Data());
+				Assert::AreEqual(ch[idx], n[idx - nsize], make_wstring(L"n[%d] = %x", idx - nsize, ch[idx])->Data());
+			}
+		}
+
+		TEST_METHOD(Fixnum_Subscript) {
+			Natural xFECDBA0123456789(0xFECDBA0123456789U);
+			Natural n(wch);
+			int size16 = int(n.fixnum_count(Fixnum::Uint16));
+			size_t idx16 = sizeof(wch) / sizeof(uint16) - size16;
+
+			Assert::AreEqual((uint64)0U, Natural().fixnum64_ref(0), L"0[0] = 0");
+			Assert::AreEqual((uint64)0U, Natural().fixnum64_ref(1), L"0[1] = 0");
+			Assert::AreEqual((uint64)0U, Natural().fixnum64_ref(-1), L"0[-1] = 0");
+
+			for (int idx = 0; idx < size16; idx++) {
+				const uint64 v = wch[idx + idx16];
+
+				Assert::AreEqual(v, (const uint64)n.fixnum16_ref(idx), make_wstring(L"n16[%d] = %x", idx, v)->Data());
+				Assert::AreEqual(v, (const uint64)n.fixnum16_ref(idx - size16), make_wstring(L"n16[%d] = %x", idx - size16, v)->Data());
+			}
+
+			Assert::AreEqual(0xFECDBA01ULL, (const uint64)xFECDBA0123456789.fixnum32_ref(0U), L"x64[0]");
+			Assert::AreEqual(0xBA012345ULL, (const uint64)xFECDBA0123456789.fixnum32_ref(-2, 2), L"x64[-2o2]");
 		}
 	};
 
@@ -133,8 +171,8 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		void test_addition(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
-			std::string lhex = lhs.to_hexstring();
-			std::string rhex = rhs.to_hexstring();
+			bytes lhex = lhs.to_hexstring();
+			bytes rhex = rhs.to_hexstring();
 			Platform::String^ lhs_message = make_wstring(L"(LR+ #x%S #x%S)", lhex.c_str(), rhex.c_str());
 			Platform::String^ rhs_message = make_wstring(L"(RL+ #x%S #x%S)", rhex.c_str(), lhex.c_str());
 			
@@ -148,8 +186,8 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		void test_multiplication(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
-			std::string lhex = lhs.to_hexstring();
-			std::string rhex = rhs.to_hexstring();
+			bytes lhex = lhs.to_hexstring();
+			bytes rhex = rhs.to_hexstring();
 			Platform::String^ lhs_message = make_wstring(L"(LR* #x%S #x%S)", lhex.c_str(), rhex.c_str());
 			Platform::String^ rhs_message = make_wstring(L"(RL* #x%S #x%S)", rhex.c_str(), lhex.c_str());
 
