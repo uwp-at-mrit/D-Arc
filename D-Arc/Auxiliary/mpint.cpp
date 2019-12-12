@@ -3,6 +3,8 @@
 #include "datum/natural.hpp"
 #include "datum/string.hpp"
 
+#include "syslog.hpp"
+
 using namespace WarGrey::SCADA;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -127,6 +129,13 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 
 			Assert::AreEqual(0xFECDBA01ULL, (const uint64)xFECDBA0123456789.fixnum32_ref(0U), L"x64[0]");
 			Assert::AreEqual(0xBA012345ULL, (const uint64)xFECDBA0123456789.fixnum32_ref(-2, 2), L"x64[-2o2]");
+		}
+
+		TEST_METHOD(Bytes) {
+			Natural HW_ID("12345");
+			bytes HW_BS = HW_ID.to_bytes();
+
+			Assert::IsTrue(memcmp(HW_BS.c_str(), &HW_ID[0], HW_BS.size()) == 0,  L"Natural as Bytes");
 		}
 	};
 
