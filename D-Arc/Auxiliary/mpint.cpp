@@ -251,8 +251,24 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 				}
 			}
 
-			test_rshift(Natural(16, "6243299885435508"), 92, Natural(16, "00"));
 			test_rshift(Natural(16, "2718281828459045"), 10, Natural(16, "09C60A060A1164"));
+			test_rshift(Natural(16, "6243299885435508"), 45, Natural(16, "031219"));
+			test_rshift(Natural(16, "765432100123456789ABCDEF"), 108, Natural(16, "00"));
+			test_rshift(Natural(16, "FECDBA98765432100123456789ABCDEF"), 92, Natural(16, "0FECDBA987"));
+		}
+
+		TEST_METHOD(And) {
+			test_bitwise_and(Natural(16, "ABC"), 0, Natural(16, "00"));
+			test_bitwise_and(Natural(16, "ABCDEF"), 0xAB00FFFF00, Natural(16, "ABCD00"));
+			test_bitwise_and(Natural(16, "90ABCDEF"), 0xCD00FFFF00, Natural(16, "ABCD00"));
+			test_bitwise_and(Natural(16, "567890ABCDEF"), 0xEF00FFFF00, Natural(16, "6800ABCD00"));
+		}
+
+		TEST_METHOD(IOr) {
+			test_bitwise_ior(Natural(16, "ABC"), 0, Natural(16, "0ABC"));
+			test_bitwise_ior(Natural(16, "ABCDEF"), 0xAB00FFFF00, Natural(16, "AB00FFFFEF"));
+			test_bitwise_ior(Natural(16, "90ABCDEF"), 0xCD00FFFF00, Natural(16, "CD90FFFFEF"));
+			test_bitwise_ior(Natural(16, "567890ABCDEF"), 0xEF00FFFF00, Natural(16, "56FF90FFFFEF"));
 		}
 
 	private:
@@ -268,6 +284,26 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ message = make_wstring(L"(>> #x%S %u)", rhex.c_str(), rhs);
 
 			assert(lhs >> rhs, r, message);
+		}
+
+		void test_bitwise_and(Natural& lhs, uint64 rhs, Natural& r) {
+			Natural rn(rhs);
+			bytes rhex = lhs.to_hexstring();
+			Platform::String^ u_message = make_wstring(L"(and #x%S #x%08x)", rhex.c_str(), rhs);
+			Platform::String^ n_message = make_wstring(L"(and #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
+
+			assert(lhs & rhs, r, u_message);
+			assert(lhs & rn, r, n_message);
+		}
+
+		void test_bitwise_ior(Natural& lhs, uint64 rhs, Natural& r) {
+			Natural rn(rhs);
+			bytes rhex = lhs.to_hexstring();
+			Platform::String^ u_message = make_wstring(L"(ior #x%S #x%08x)", rhex.c_str(), rhs);
+			Platform::String^ n_message = make_wstring(L"(ior #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
+
+			assert(lhs | rhs, r, u_message);
+			assert(lhs | rn, r, n_message);
 		}
 	};
 }
