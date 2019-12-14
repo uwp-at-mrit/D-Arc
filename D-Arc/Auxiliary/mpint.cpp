@@ -32,8 +32,11 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 	private class Construction : public TestClass<Construction> {
 	public:
 		TEST_METHOD(Fixnum) {
+			Natural DULL(0xDU);
+			Natural copied_xDULL = DULL;
+
 			assert(Natural(),                    "00",               0U, 0U,  "Empty Natural");
-			assert(Natural(0xDU),                "0D",               1U, 4U,  "#xDU");
+			assert(copied_xDULL,                 "0D",               1U, 4U,  "#xDU");
 			assert(Natural(0x4021U),             "4021",             2U, 15U, "#x4021U");
 			assert(Natural(0xEFCDBA01U),         "EFCDBA01",         4U, 32U, "#xEFCDBA01U");
 			assert(Natural(0x23456789U),         "23456789",         4U, 30U, "#x23456789U");
@@ -157,7 +160,8 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_addition(Natural(16, "161803398874989484820"), 0x35323U, "01618033988749894B9B43", 81U);
 			test_addition(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539, "3006050FB7A76AC18302FB5B3891", 110U);
 
-			test_addition(Natural(0x3), Natural(), "03", 2U);
+			test_addition(Natural(0x3U), Natural(), "03", 2U);
+			test_addition(Natural(0xFFU), Natural(0xFFFF01U), "01000000", 25U);
 			test_addition(Natural(wch), Natural(wch), "ECA8642002468ACF13579BDE", 96U);
 			test_addition(Natural(ch), Natural(wch), "FECDBA98ECA8642002468ACF13579BDE", 128U);
 			test_addition(Natural(ch), Natural(ch), "01FD9B7530ECA8642002468ACF13579BDE", 129U);
@@ -271,6 +275,37 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_bitwise_ior(Natural(16, "567890ABCDEF"), 0xEF00FFFF00, Natural(16, "56FF90FFFFEF"));
 		}
 
+		TEST_METHOD(XOr) {
+			test_bitwise_xor(Natural(16, "ABC"), 0, Natural(16, "0ABC"));
+			test_bitwise_xor(Natural(16, "ABC"), 0xABC, Natural());
+			test_bitwise_xor(Natural(16, "ABC"), 0xACD, Natural(16, "71"));
+			test_bitwise_xor(Natural(16, "ABCDEF"), 0xAB00FFCDEF, Natural(16, "AB00540000"));
+			test_bitwise_xor(Natural(16, "34567890ABCDEF"), 0xEF00FFFF00, Natural(16, "345697905432EF"));
+		}
+
+		TEST_METHOD(Bitset) {
+			Natural x5F5 = Natural(0x5F5);
+
+			Assert::IsTrue(x5F5.is_bit_set(0), L"(bitwise-bit-set? 0x5F5 0)");
+			Assert::IsFalse(x5F5.is_bit_set(9), L"(bitwise-bit-set? 0x5F5 9)");
+			Assert::IsTrue(x5F5.is_bit_set(10), L"(bitwise-bit-set? 0x5F5 10)");
+			Assert::IsFalse(x5F5.is_bit_set(20), L"(bitwise-bit-set? 0x5F5 20)");
+		}
+
+		TEST_METHOD(Bitfield) {
+			unsigned long long x = 0xFFABCDU;
+			Natural FFABCD(x);
+
+			assert(Natural(13).bit_field(1, 1), Natural(0U), "(bitwise-bit-field 13 1 1)");
+			assert(Natural(13).bit_field(1, 3), Natural(2U), "(bitwise-bit-field 13 1 3)");
+			assert(Natural(13).bit_field(1, 4), Natural(6U), "(bitwise-bit-field 13 1 4)");
+
+			for (size_t idx = 0; idx < 33; idx++) {
+				assert(FFABCD.bit_field(idx, 32), Natural((x >> idx) & ((1ULL << (32ULL - idx)) - 1ULL)),
+					make_wstring(L"(bitwise-bit-field #x%S %d 32)", FFABCD.to_hexstring().c_str(), idx));
+			}
+		}
+
 	private:
 		void test_lshift(Natural& lhs, uint64 rhs, Natural& r) {
 			bytes lhex = lhs.to_hexstring();
@@ -292,7 +327,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ u_message = make_wstring(L"(and #x%S #x%08x)", rhex.c_str(), rhs);
 			Platform::String^ n_message = make_wstring(L"(and #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
 
-			assert(lhs & rhs, r, u_message);
+			assert(rhs & lhs, r, u_message);
 			assert(lhs & rn, r, n_message);
 		}
 
@@ -302,8 +337,18 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ u_message = make_wstring(L"(ior #x%S #x%08x)", rhex.c_str(), rhs);
 			Platform::String^ n_message = make_wstring(L"(ior #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
 
-			assert(lhs | rhs, r, u_message);
+			assert(rhs | lhs, r, u_message);
 			assert(lhs | rn, r, n_message);
+		}
+
+		void test_bitwise_xor(Natural& lhs, uint64 rhs, Natural& r) {
+			Natural rn(rhs);
+			bytes rhex = lhs.to_hexstring();
+			Platform::String^ u_message = make_wstring(L"(xor #x%S #x%08x)", rhex.c_str(), rhs);
+			Platform::String^ n_message = make_wstring(L"(xor #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
+
+			assert(rhs ^ lhs, r, u_message);
+			assert(lhs ^ rn, r, n_message);
 		}
 	};
 }
