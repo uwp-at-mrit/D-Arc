@@ -351,4 +351,56 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			assert(lhs ^ rn, r, n_message);
 		}
 	};
+
+	private class Comparison : public TestClass<Comparison> {
+	public:
+		TEST_METHOD(Natural_vs_Natural) {
+			unsigned long long median = 0x1010ULL;
+			uint64 ns[] = { 0x0ULL, 0x5ULL, median, 0xFE110ULL, 0xEC0000412ULL };
+			Natural Median(median);
+
+			for (size_t idx = 0; idx < sizeof(ns) / sizeof(uint64); idx++) {
+				this->test_comparison(ns[idx], median, Natural(ns[idx]), Median);
+			}
+		}
+
+		TEST_METHOD(Natural_vs_Fixnum) {
+			unsigned long long median = 0x1010ULL;
+			uint64 ns[] = { 0x0ULL, 0x5ULL, median, 0xFE110ULL, 0xEC0000412ULL };
+
+			for (size_t idx = 0; idx < sizeof(ns) / sizeof(uint64); idx++) {
+				this->test_comparison(ns[idx], median, Natural(ns[idx]), median);
+			}
+		}
+
+	private:
+		template<typename M>
+		void test_comparison(unsigned long long n, unsigned long long median, const Natural& N, M Median) {
+			if (n < median) {
+				Assert::IsTrue(N.compare(Median) < 0, make_wstring(L"[T]%x compare< %x", n, median)->Data());
+				Assert::IsTrue(Median >= N, make_wstring(L"[T]%x operator<= %x", n, median)->Data());
+				Assert::IsTrue(Median > N, make_wstring(L"[T]%x operator< %x", n, median)->Data());
+				Assert::IsTrue(Median != N, make_wstring(L"[T]%x operator!= %x", n, median)->Data());
+				Assert::IsFalse(N == Median, make_wstring(L"[F]%x operator== %x", n, median)->Data());
+				Assert::IsFalse(N >= Median, make_wstring(L"[F]%x operator>= %x", n, median)->Data());
+				Assert::IsFalse(N > Median, make_wstring(L"[F]%x operator> %x", n, median)->Data());
+			} else if (n > median) {
+				Assert::IsTrue(N.compare(Median) > 0, make_wstring(L"[T]%x compare> %x", n, median)->Data());
+				Assert::IsTrue(Median <= N, make_wstring(L"[T]%x operator>= %x", n, median)->Data());
+				Assert::IsTrue(Median < N, make_wstring(L"[T]%x operator> %x", n, median)->Data());
+				Assert::IsTrue(Median != N, make_wstring(L"[T]%x operator!= %x", n, median)->Data());
+				Assert::IsFalse(N == Median, make_wstring(L"[F]%x operator== %x", n, median)->Data());
+				Assert::IsFalse(N <= Median, make_wstring(L"[F]%x operator<= %x", n, median)->Data());
+				Assert::IsFalse(N < Median, make_wstring(L"[F]%x operator< %x", n, median)->Data());
+			} else {
+				Assert::IsTrue(N.compare(Median) == 0, make_wstring(L"[T]%x compare= %x", n, median)->Data());
+				Assert::IsTrue(Median == N, make_wstring(L"[T]%x operator== %x", n, median)->Data());
+				Assert::IsTrue(Median <= N, make_wstring(L"[T]%x operator<= %x", n, median)->Data());
+				Assert::IsTrue(Median >= N, make_wstring(L"[T]%x operator>= %x", n, median)->Data());
+				Assert::IsFalse(N != Median, make_wstring(L"[F]%x operator!= %x", n, median)->Data());
+				Assert::IsFalse(N < Median, make_wstring(L"[F]%x operator< %x", n, median)->Data());
+				Assert::IsFalse(N > Median, make_wstring(L"[F]%x operator> %x", n, median)->Data());
+			}
+		}
+	};
 }
