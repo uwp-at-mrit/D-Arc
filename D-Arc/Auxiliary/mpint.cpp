@@ -144,40 +144,57 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 	public:
 		TEST_METHOD(Increment) {
 			test_increment(Natural(), "01", 1U);
-			test_increment(Natural(0x09), "0A", 4U);
-			test_increment(Natural(0xFF), "0100", 9U);
+			test_increment(Natural(0x09U), "0A", 4U);
+			test_increment(Natural(0xFFFFU), "010000", 17U);
 			test_increment(Natural(0xFF01234567890ABCU), "FF01234567890ABD", 64U);
 			test_increment(Natural(0xFFFFFFFFFFFFFFFFU), "010000000000000000", 65U);
+		}
+
+		TEST_METHOD(Decrement) {
+			test_decrement(Natural(), "00", 0U);
+			test_decrement(Natural(0x09U), "08", 4U);
+			test_decrement(Natural(0x10000U), "FFFF", 16U);
+			test_decrement(Natural(0xFF01234567890ABCU), "FF01234567890ABB", 64U);
 		}
 
 	public:
 		TEST_METHOD(Addition) {
 			test_addition(Natural(0x1), 0x0U, "01", 1U);
-			test_addition(Natural(0x2), 0x113198824U, "0113198826", 33U);
+			test_addition(Natural(0xFFU), 0xFFFF01U, "01000000", 25U);
 			test_addition(Natural(0x2718281828459045U), 0x3141592653589793U, "5859813E7B9E27D8", 63U);
 			test_addition(Natural(0x6243299885435508U), 0x6601618158468695U, "C8448B19DD89DB9D", 64U);
 			test_addition(Natural(0x7642236535892206U), 0x9159655941772190U, "01079B88BE77004396", 65U);
 			test_addition(Natural(16, "161803398874989484820"), 0x35323U, "01618033988749894B9B43", 81U);
 			test_addition(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539, "3006050FB7A76AC18302FB5B3891", 110U);
 
-			test_addition(Natural(0x3U), Natural(), "03", 2U);
-			test_addition(Natural(0xFFU), Natural(0xFFFF01U), "01000000", 25U);
 			test_addition(Natural(wch), Natural(wch), "ECA8642002468ACF13579BDE", 96U);
 			test_addition(Natural(ch), Natural(wch), "FECDBA98ECA8642002468ACF13579BDE", 128U);
 			test_addition(Natural(ch), Natural(ch), "01FD9B7530ECA8642002468ACF13579BDE", 129U);
 		}
 
+		TEST_METHOD(Subtraction) {
+			test_subtraction(Natural(0x1), 0x0U, "01", 1U);
+			test_subtraction(Natural(0x100U), 0xFFU, "01", 1U);
+			test_subtraction(Natural(0x10000U), 0xFFU, "FF01", 16U);
+			test_subtraction(Natural(0x2718281828459045U), 0x3141592653589793U, "0A29310E2B13074E", 60U);
+			test_subtraction(Natural(0x6243299885435508U), 0x6601618158468695U, "03BE37E8D303318D", 58U);
+			test_subtraction(Natural(0x7642236535892206U), 0x9159655941772190U, "1B1741F40BEDFF8A", 61U);
+			test_subtraction(Natural(16, "161803398874989484820"), 0x35323U, "016180339887498944F4FD", 81U);
+			test_subtraction(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539, "3006050FB7A76AC18302FB572E1F", 110U);
+
+			test_subtraction(Natural(wch), Natural(wch), "00", 0U);
+			test_subtraction(Natural(ch), Natural(wch), "FECDBA98000000000000000000000000", 128U);
+		}
+
 		TEST_METHOD(Multiplicaton) {
 			test_multiplication(Natural(0x1), 0x0U, "00", 0U);
+			test_multiplication(Natural(0x392), 0x54U, "012BE8", 17U);
 			test_multiplication(Natural(0x2), 0x113198824U, "0226331048", 34U);
 			test_multiplication(Natural(0x2718281828459045U), 0x3141592653589793U, "07859A6C0E1840504FE2128E1EC28A9F", 123U);
 			test_multiplication(Natural(0x6243299885435508U), 0x6601618158468695U, "27274A43072E41D0558E8232CEE2ADA8", 126U);
 			test_multiplication(Natural(0x7642236535892206U), 0x9159655941772190U, "4324C1DBF4B5587D2396DB4D214FE960", 127U);
 			test_multiplication(Natural(16, "161803398874989484820"), 0x1U, "0161803398874989484820", 81U);
 
-			test_multiplication(Natural(0x3), Natural(), "00", 0U);
-			test_multiplication(Natural(914), Natural(1), "0392", 10);
-			test_multiplication(Natural(914), Natural(84), "012BE8", 17);
 			test_multiplication(Natural(wch), Natural(wch), "36B1B9D7A5578492EA6324B6A6F7108CDCA5E20890F2A521", 190U);
 			test_multiplication(Natural(ch), Natural(wch), "75C6A1579D00FC474137A8FA8668109EA6F7108CDCA5E20890F2A521", 223U);
 			test_multiplication(Natural(ch), Natural(ch), "FD9CE39AEAFE7CEF03503EB6DD17CD62226CFC86A6F7108CDCA5E20890F2A521", 256U);
@@ -186,15 +203,22 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 
 	private:
 		void test_increment(Natural& n, const char* representation, size_t bits) {
+			Platform::String^ message = make_wstring(L"#x%S++", n.to_hexstring().c_str());
+			
 			n++;
+			assert(n, representation, bits, message);
+		}
 
-			assert(n, representation, bits,
-				make_wstring(L"#x%S++", n.to_hexstring().c_str()));
+		void test_decrement(Natural& n, const char* representation, size_t bits) {
+			Platform::String^ message = make_wstring(L"#x%S--", n.to_hexstring().c_str());
+
+			n--;
+			assert(n, representation, bits, message);
 		}
 		
 		void test_addition(Natural& lhs, unsigned long long rhs, const char* representation, size_t bits) {
-			assert(rhs + lhs, representation, bits,
-				make_wstring(L"(+ #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
+			assert(rhs + lhs, representation, bits, make_wstring(L"(+ #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
+			this->test_addition(lhs, Natural(rhs), representation, bits);
 		}
 
 		void test_addition(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
@@ -202,14 +226,39 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			bytes rhex = rhs.to_hexstring();
 			Platform::String^ lhs_message = make_wstring(L"(LR+ #x%S #x%S)", lhex.c_str(), rhex.c_str());
 			Platform::String^ rhs_message = make_wstring(L"(RL+ #x%S #x%S)", rhex.c_str(), lhex.c_str());
-			
+
 			assert(lhs + rhs, representation, bits, lhs_message);
 			assert(rhs + lhs, representation, bits, rhs_message);
 		}
 
+		void test_subtraction(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
+			bytes lhex = lhs.to_hexstring();
+			bytes rhex = rhs.to_hexstring();
+			Platform::String^ lhs_message = make_wstring(L"(LR- #x%S #x%S)", lhex.c_str(), rhex.c_str());
+			Platform::String^ rhs_message = make_wstring(L"(RL- #x%S #x%S)", rhex.c_str(), lhex.c_str());
+
+			if (lhs >= rhs) {
+				assert(lhs - rhs, representation, bits, lhs_message);
+				assert(rhs - lhs, "00", 0L, rhs_message);
+			} else {
+				assert(rhs - lhs, representation, bits, rhs_message);
+				assert(lhs - rhs, "00", 0L, lhs_message);
+			}
+		}
+
+		void test_subtraction(Natural& lhs, unsigned long long rhs, const char* representation, size_t bits) {
+			if (lhs >= rhs) {
+				assert(lhs - rhs, representation, bits, make_wstring(L"(LR- #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
+				assert(rhs - lhs, "00", 0L, make_wstring(L"(RL- #x%X #x%S)", rhs, lhs.to_hexstring().c_str()));
+				this->test_subtraction(lhs, Natural(rhs), representation, bits);
+			} else {
+				this->test_subtraction(Natural(rhs), lhs, representation, bits);
+			}
+		}
+
 		void test_multiplication(Natural& lhs, unsigned long long rhs, const char* representation, size_t bits) {
-			assert(rhs * lhs, representation, bits,
-				make_wstring(L"(* #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
+			assert(rhs * lhs, representation, bits, make_wstring(L"(* #x%S #x%X)", lhs.to_hexstring().c_str(), rhs));
+			this->test_multiplication(lhs, Natural(rhs), representation, bits);
 		}
 
 		void test_multiplication(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
@@ -328,7 +377,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ n_message = make_wstring(L"(and #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
 
 			assert(rhs & lhs, r, u_message);
-			assert(lhs & rn, r, n_message);
+			assert(rn & lhs, r, n_message);
 		}
 
 		void test_bitwise_ior(Natural& lhs, uint64 rhs, Natural& r) {
@@ -338,7 +387,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ n_message = make_wstring(L"(ior #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
 
 			assert(rhs | lhs, r, u_message);
-			assert(lhs | rn, r, n_message);
+			assert(rn | lhs, r, n_message);
 		}
 
 		void test_bitwise_xor(Natural& lhs, uint64 rhs, Natural& r) {
@@ -348,7 +397,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ n_message = make_wstring(L"(xor #x%S #x%S)", rhex.c_str(), rn.to_hexstring().c_str());
 
 			assert(rhs ^ lhs, r, u_message);
-			assert(lhs ^ rn, r, n_message);
+			assert(rn ^ lhs, r, n_message);
 		}
 	};
 
