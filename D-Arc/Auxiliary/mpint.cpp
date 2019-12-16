@@ -189,7 +189,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		TEST_METHOD(Multiplicaton) {
 			test_multiplication(Natural(0x1), 0x0U, "00", 0U);
 			test_multiplication(Natural(0x392), 0x54U, "012BE8", 17U);
-			test_multiplication(Natural(0x2), 0x113198824U, "0226331048", 34U);
+			test_multiplication(Natural(0x128), 0x1131988242053954U, "13E158569C560A4920", 69U);
 			test_multiplication(Natural(0x2718281828459045U), 0x3141592653589793U, "07859A6C0E1840504FE2128E1EC28A9F", 123U);
 			test_multiplication(Natural(0x6243299885435508U), 0x6601618158468695U, "27274A43072E41D0558E8232CEE2ADA8", 126U);
 			test_multiplication(Natural(0x7642236535892206U), 0x9159655941772190U, "4324C1DBF4B5587D2396DB4D214FE960", 127U);
@@ -199,6 +199,11 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_multiplication(Natural(ch), Natural(wch), "75C6A1579D00FC474137A8FA8668109EA6F7108CDCA5E20890F2A521", 223U);
 			test_multiplication(Natural(ch), Natural(ch), "FD9CE39AEAFE7CEF03503EB6DD17CD62226CFC86A6F7108CDCA5E20890F2A521", 256U);
 			test_multiplication(Natural(16, "3006050FB7A76AC18302FB593358"), Natural(16, "20539"), "6106D98FDE64FEDF92AB31451B8D2698", 127U);
+		}
+
+		TEST_METHOD(Exponentiation) {
+			test_exponentiation(Natural(0x1), 0x0U, "01", 1U);
+			test_exponentiation(Natural(0x392), 0x54U, "04AF82A2B66B66F5A561E0DB8CAA8230CC792CB02D236D5892278142CE6816E694EE400DA34D979C2721FAB2462ED830DE678DD2BBD7908B5B77807101D3D9C22269FB6DF3C6CBE1872A931CF8AA1A35D31A79970E179A678FA0B679D21000000000000000000000", 827U);
 		}
 
 	private:
@@ -227,8 +232,12 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ lhs_message = make_wstring(L"(LR+ #x%S #x%S)", lhex.c_str(), rhex.c_str());
 			Platform::String^ rhs_message = make_wstring(L"(RL+ #x%S #x%S)", rhex.c_str(), lhex.c_str());
 
-			assert(lhs + rhs, representation, bits, lhs_message);
-			assert(rhs + lhs, representation, bits, rhs_message);
+			if (lhs == rhs) {
+				assert(lhs + lhs, representation, bits, lhs_message);
+			} else {
+				assert(lhs + rhs, representation, bits, lhs_message);
+				assert(rhs + lhs, representation, bits, rhs_message);
+			}
 		}
 
 		void test_subtraction(Natural& lhs, Natural& rhs, const char* representation, size_t bits) {
@@ -237,7 +246,9 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ lhs_message = make_wstring(L"(LR- #x%S #x%S)", lhex.c_str(), rhex.c_str());
 			Platform::String^ rhs_message = make_wstring(L"(RL- #x%S #x%S)", rhex.c_str(), lhex.c_str());
 
-			if (lhs >= rhs) {
+			if (lhs == rhs) {
+				assert(lhs - rhs, representation, bits, lhs_message);
+			} else if (lhs > rhs) {
 				assert(lhs - rhs, representation, bits, lhs_message);
 				assert(rhs - lhs, "00", 0L, rhs_message);
 			} else {
@@ -267,8 +278,21 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ lhs_message = make_wstring(L"(LR* #x%S #x%S)", lhex.c_str(), rhex.c_str());
 			Platform::String^ rhs_message = make_wstring(L"(RL* #x%S #x%S)", rhex.c_str(), lhex.c_str());
 
-			assert(lhs * rhs, representation, bits, lhs_message);
-			assert(rhs * lhs, representation, bits, rhs_message);
+			if (lhs == rhs) {
+				assert(lhs * lhs, representation, bits, lhs_message);
+			} else {
+				assert(lhs * rhs, representation, bits, lhs_message);
+				assert(rhs * lhs, representation, bits, rhs_message);
+			}
+		}
+
+		void test_exponentiation(Natural& base, unsigned long long e, const char* representation, size_t bits) {
+			bytes lhex = base.to_hexstring();
+			Platform::String^ fixnum_message = make_wstring(L"(fxexpt #x%S #x%x)", lhex.c_str(), e);
+			Platform::String^ natural_message = make_wstring(L"(expt #x%S #x%x)", lhex.c_str(), e);
+
+			assert(expt(base, e), representation, bits, fixnum_message);
+			assert(expt(base, Natural(e)), representation, bits, natural_message);
 		}
 	};
 
