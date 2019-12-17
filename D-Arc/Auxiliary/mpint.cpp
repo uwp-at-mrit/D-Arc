@@ -202,17 +202,18 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		TEST_METHOD(Division) {
-			test_division(Natural(0x392), 0x54U, "0A", 4, "4A", 7);
-			test_division(Natural(0x100U), 0xFFU, "01", 1, "01", 1);
-			test_division(Natural(0x10000U), 0xFFU, "0101", 9, "01", 1);
-			test_division(Natural(0x2718281828459045U), 0x3141592653589793U, "0EDEC916B5A3A7", 52, "3C", 6);
-			test_division(Natural(0x6243299885435508U), 0x6601618158468695U, "01", 1, "0A29310E2B13074E", 60);
-			test_division(Natural(0x7642236535892206U), 0x9159655941772190U, "01", 1, "03BE37E8D303318D", 58);
-			test_division(Natural(16, "161803398874989484820"), 0x1U, "0161803398874989484820", 81, "00", 0);
-			test_division(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539, "17C4F0C12B65E1D489FF22ED", 93, "01CB93", 17);
+			test_division(Natural(0x392ULL), 0x54ULL, "0A", 4, "4A", 7);
+			test_division(Natural(0x100ULL), 0xFFULL, "01", 1, "01", 1);
+			test_division(Natural(0x10000ULL), 0xFFULL, "0101", 9, "01", 1);
+			test_division(Natural(0x128ULL), 0x1131988242053954ULL, "00", 0, "0128", 9);
+			test_division(Natural(0x2718281828459045ULL), 0x3141592653589793ULL, "00", 0, "2718281828459045", 62);
+			test_division(Natural(0x3141592653589793ULL), 0x2718281828459045ULL, "01", 1, "0A29310E2B13074E", 60);
+			test_division(Natural(16, "161803398874989484820"), 0x1ULL, "0161803398874989484820", 81, "00", 0);
+			test_division(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539ULL, "17C4F0C12B65E1D489FF22ED", 93, "01CB93", 17);
 
 			test_division(Natural(wch), Natural(wch), "01", 1U, "00", 0U);
-			test_division(Natural(ch), Natural(wch), "0227420275", 34, "5EE1FB4377777779C5ECD1B4", 95);
+			test_division(Natural(wch), Natural(ch), "0227420275", 34, "5EE1FB4377777779C5ECD1B4", 95);
+			test_division(Natural(ch), Natural(wch), "00", 0, "765432100123456789ABCDEF", 95);
 		}
 
 		TEST_METHOD(Exponentiation) {
@@ -301,29 +302,19 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		void test_division(Natural& lhs, unsigned long long rhs, const char* quotient, size_t qbits, const char* remainder, size_t rbits) {
-			this->test_division(lhs, Natural(rhs), quotient, qbits, remainder, rbits);
+			assert(lhs / rhs, quotient, qbits, make_wstring(L"(/ #x%S #x%llX)", lhs.to_hexstring().c_str(), rhs));
+			assert(lhs % rhs, remainder, rbits, make_wstring(L"(%% #x%S #x%llX)", lhs.to_hexstring().c_str(), rhs));
+			//this->test_division(lhs, Natural(rhs), quotient, qbits, remainder, rbits);
 		}
 
 		void test_division(Natural& lhs, Natural& rhs, const char* quotient, size_t qbits, const char* remainder, size_t rbits) {
 			bytes lhex = lhs.to_hexstring();
 			bytes rhex = rhs.to_hexstring();
-			Platform::String^ lq_message = make_wstring(L"(LR/ #x%S #x%S)", lhex.c_str(), rhex.c_str());
-			Platform::String^ lr_message = make_wstring(L"(LR% #x%S #x%S)", lhex.c_str(), rhex.c_str());
-			Platform::String^ rq_message = make_wstring(L"(RL/ #x%S #x%S)", rhex.c_str(), lhex.c_str());
-			Platform::String^ rr_message = make_wstring(L"(RL% #x%S #x%S)", rhex.c_str(), lhex.c_str());
+			Platform::String^ q_message = make_wstring(L"(/ #x%S #x%S)", lhex.c_str(), rhex.c_str());
+			Platform::String^ r_message = make_wstring(L"(%% #x%S #x%S)", lhex.c_str(), rhex.c_str());
 
-			if (lhs == rhs) {
-				assert(lhs / rhs, quotient, qbits, lq_message);
-				//assert(lhs % rhs, remainder, rbits, lr_message);
-			} else if (lhs > rhs) {
-				assert(lhs / rhs, quotient, qbits, lq_message);
-				//assert(lhs % rhs, remainder, rbits, lr_message);
-				//assert(rhs / lhs, "00", 0L, rq_message);
-			} else {
-				assert(rhs / lhs, quotient, qbits, rq_message);
-				//assert(rhs % lhs, remainder, rbits, rr_message);
-				//assert(lhs / rhs, "00", 0L, lq_message);
-			}
+			assert(lhs / rhs, quotient, qbits, q_message);
+			assert(lhs % rhs, remainder, rbits, r_message);
 		}
 
 		void test_exponentiation(Natural& base, unsigned long long e, const char* representation, size_t bits) {
