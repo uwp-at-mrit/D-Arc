@@ -314,15 +314,15 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 
 			if (lhs == rhs) {
 				assert(lhs / rhs, quotient, qbits, lq_message);
-				assert(lhs % rhs, remainder, rbits, lr_message);
+				//assert(lhs % rhs, remainder, rbits, lr_message);
 			} else if (lhs > rhs) {
 				assert(lhs / rhs, quotient, qbits, lq_message);
-				assert(lhs % rhs, remainder, rbits, lr_message);
-				assert(rhs / lhs, "00", 0L, rq_message);
+				//assert(lhs % rhs, remainder, rbits, lr_message);
+				//assert(rhs / lhs, "00", 0L, rq_message);
 			} else {
 				assert(rhs / lhs, quotient, qbits, rq_message);
-				assert(rhs % lhs, remainder, rbits, rr_message);
-				assert(lhs / rhs, "00", 0L, lq_message);
+				//assert(rhs % lhs, remainder, rbits, rr_message);
+				//assert(lhs / rhs, "00", 0L, lq_message);
 			}
 		}
 
