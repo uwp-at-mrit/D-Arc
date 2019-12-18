@@ -217,6 +217,8 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_division(Natural(ch), Natural(16, "1618033988749894848204"), "0B88665ADFB7", 44, "0F20C5A23AC272A4496113", 84);
 			test_division(Natural(ch), Natural(16, "2718281828459045235360"), "06848526043B", 43, "0B3E510D442103CCFA16CF", 84);
 			test_division(Natural(ch), Natural(16, "3141592653589793238462"), "052C51E3E52C", 43, "2CAC985CEA1482153F6317", 86);
+			test_division(Natural(wch), Natural(16, "980665029979245802"), "C7420D", 24, "2C9E0967209A94D1D5", 70);
+			test_division(Natural(16, "0102030405060708090A0B0C0D0E0F"), Natural(16, "2314069263277926900"), "75AF6A3EF3", 39, "01F6766CF9C79CA5630F", 73);
 		}
 
 		TEST_METHOD(Exponentiation) {
