@@ -212,13 +212,18 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_division(Natural(16, "3006050FB7A76AC18302FB593358"), 0x20539ULL, "17C4F0C12B65E1D489FF22ED", 93, "01CB93", 17);
 
 			test_division(Natural(wch), Natural(wch), "01", 1U, "00", 0U);
-			test_division(Natural(wch), Natural(ch), "0227420275", 34, "5EE1FB4377777779C5ECD1B4", 95);
-			test_division(Natural(ch), Natural(wch), "00", 0, "765432100123456789ABCDEF", 95);
+			test_division(Natural(wch), Natural(ch), "00", 0, "765432100123456789ABCDEF", 95);
+			test_division(Natural(ch), Natural(wch), "0227420275", 34, "5EE1FB4377777779C5ECD1B4", 95);
+			test_division(Natural(ch), Natural(16, "1618033988749894848204"), "0B88665ADFB7", 44, "0F20C5A23AC272A4496113", 84);
+			test_division(Natural(ch), Natural(16, "2718281828459045235360"), "06848526043B", 43, "0B3E510D442103CCFA16CF", 84);
+			test_division(Natural(ch), Natural(16, "3141592653589793238462"), "052C51E3E52C", 43, "2CAC985CEA1482153F6317", 86);
 		}
 
 		TEST_METHOD(Exponentiation) {
 			test_exponentiation(Natural(0x1), 0x0U, "01", 1U);
 			test_exponentiation(Natural(0x392), 0x54U, "04AF82A2B66B66F5A561E0DB8CAA8230CC792CB02D236D5892278142CE6816E694EE400DA34D979C2721FAB2462ED830DE678DD2BBD7908B5B77807101D3D9C22269FB6DF3C6CBE1872A931CF8AA1A35D31A79970E179A678FA0B679D21000000000000000000000", 827U);
+			
+			//assert(Natural(9ULL).expt(158235208ULL) % 19, Natural(4), "(modulo (expt 9 158235208) 19)");
 		}
 
 	private:
@@ -304,7 +309,9 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		void test_division(Natural& lhs, unsigned long long rhs, const char* quotient, size_t qbits, const char* remainder, size_t rbits) {
 			assert(lhs / rhs, quotient, qbits, make_wstring(L"(/ #x%S #x%llX)", lhs.to_hexstring().c_str(), rhs));
 			assert(lhs % rhs, remainder, rbits, make_wstring(L"(%% #x%S #x%llX)", lhs.to_hexstring().c_str(), rhs));
-			this->test_division(lhs, Natural(rhs), quotient, qbits, remainder, rbits);
+			
+			// This will be optimized to use `Natural / fixnum` method
+			// this->test_division(lhs, Natural(rhs), quotient, qbits, remainder, rbits);
 		}
 
 		void test_division(Natural& lhs, Natural& rhs, const char* quotient, size_t qbits, const char* remainder, size_t rbits) {
