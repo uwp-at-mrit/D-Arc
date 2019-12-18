@@ -304,7 +304,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		void test_division(Natural& lhs, unsigned long long rhs, const char* quotient, size_t qbits, const char* remainder, size_t rbits) {
 			assert(lhs / rhs, quotient, qbits, make_wstring(L"(/ #x%S #x%llX)", lhs.to_hexstring().c_str(), rhs));
 			assert(lhs % rhs, remainder, rbits, make_wstring(L"(%% #x%S #x%llX)", lhs.to_hexstring().c_str(), rhs));
-			//this->test_division(lhs, Natural(rhs), quotient, qbits, remainder, rbits);
+			this->test_division(lhs, Natural(rhs), quotient, qbits, remainder, rbits);
 		}
 
 		void test_division(Natural& lhs, Natural& rhs, const char* quotient, size_t qbits, const char* remainder, size_t rbits) {
