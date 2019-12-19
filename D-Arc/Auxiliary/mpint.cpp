@@ -353,7 +353,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			Platform::String^ fixnum_message = make_wstring(L"(fxmodular-expt #x%S #x%llX #x%llX)", lhex.c_str(), b, n);
 			Platform::String^ natural_message = make_wstring(L"(modular-expt #x%S #x%llX #x%llX)", lhex.c_str(), b, n);
 
-			//assert(modular_expt(a, b, n), representation, bits, fixnum_message);
+			assert(modular_expt(a, b, n), representation, bits, fixnum_message);
 			assert(modular_expt(a, Natural(b), Natural(n)), representation, bits, natural_message);
 		}
 	};
