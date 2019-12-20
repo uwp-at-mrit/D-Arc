@@ -229,16 +229,20 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			test_exponentiation(Natural(0x1), 0x0U, "01", 1U);
 			test_exponentiation(Natural(0x392), 0x54U, "04AF82A2B66B66F5A561E0DB8CAA8230CC792CB02D236D5892278142CE6816E694EE400DA34D979C2721FAB2462ED830DE678DD2BBD7908B5B77807101D3D9C22269FB6DF3C6CBE1872A931CF8AA1A35D31A79970E179A678FA0B679D21000000000000000000000", 827U);
 			
-			//assert(Natural(9ULL).expt(158235208ULL) % 19, Natural(4), "(modulo (expt 9 158235208) 19)");
+			//assert(Natural(9ULL).expt(158235208ULL) % 19, Natural(4), "(modulo (expt 9 158235208) 19)"); // won't finish within 30 minutes
 		}
 
 		TEST_METHOD(ModularExponentiation) {
+			test_modular_exponentiation(Natural(ch), 0ULL, 0x645ULL, "01", 1);
+			test_modular_exponentiation(Natural(ch), 1ULL, 0x645ULL, "0528", 11);
 			test_modular_exponentiation(Natural(0x3U), 0x284ULL, 0x285ULL, "24", 6);
 			test_modular_exponentiation(Natural(0x3U), 0x7d3ULL, 0x63ULL, "1B", 5);
 			test_modular_exponentiation(Natural(0x7U), 0x284ULL, 0x285ULL, "01B4", 9);
 			test_modular_exponentiation(Natural(0xBU), 0x284ULL, 0x285ULL, "01", 1);
 			test_modular_exponentiation(Natural(0x7BU), 0x3e9ULL, 0x65ULL, "16", 5);
 			test_modular_exponentiation(Natural(0x9U), 0x96e7a48ULL, 0x13ULL, "04", 3);
+
+			test_modular_exponentiation(Natural(ch), Natural(16, "161803398874989484"), Natural(wch), "3C5DE61FAE8FABDB9591D680", 94);
 		}
 
 	private:
@@ -349,12 +353,22 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		void test_modular_exponentiation(Natural& a, unsigned long long b, unsigned long long n, const char* representation, size_t bits) {
-			bytes lhex = a.to_hexstring();
-			Platform::String^ fixnum_message = make_wstring(L"(fxmodular-expt #x%S #x%llX #x%llX)", lhex.c_str(), b, n);
-			Platform::String^ natural_message = make_wstring(L"(modular-expt #x%S #x%llX #x%llX)", lhex.c_str(), b, n);
+			Platform::String^ fixnum_message = make_wstring(L"(fxmodular-expt #x%S #x%llX #x%llX)", a.to_hexstring().c_str(), b, n);
+			Platform::String^ natural_message = make_wstring(L"(modular-expt #x%S #x%llX #x%llX)", a.to_hexstring().c_str(), b, n);
 
 			assert(modular_expt(a, b, n), representation, bits, fixnum_message);
+
+			// These will be optimized to use `Natural ^ fixnum % fixnum` method, but we should check this claim.
 			assert(modular_expt(a, Natural(b), Natural(n)), representation, bits, natural_message);
+			assert(modular_expt(a, Natural(b), n), representation, bits, natural_message);
+			assert(modular_expt(a, b, Natural(n)), representation, bits, natural_message);
+		}
+
+		void test_modular_exponentiation(Natural& a, Natural& b, Natural& n, const char* representation, size_t bits) {
+			Platform::String^ natural_message = make_wstring(L"(modular-expt #x%S #x%S #x%S)",
+				a.to_hexstring().c_str(), b.to_hexstring().c_str(), n.to_hexstring().c_str());
+
+			assert(modular_expt(a, b, n), representation, bits, natural_message);
 		}
 	};
 
