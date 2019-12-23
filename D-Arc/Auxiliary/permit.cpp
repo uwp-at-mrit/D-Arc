@@ -10,6 +10,8 @@ using namespace WarGrey::SCADA;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
+#include "syslog.hpp"
+
 /**************************************************************************************************/
 namespace WarGrey::Tamer::Auxiliary::Crypto {
 	static void test_bytes(bytes& expected, bytes& actual, Platform::String^ message) {
@@ -39,18 +41,18 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 		}
 
 		TEST_METHOD(ASCII) {
-			Assert::AreEqual("3130", (char*)enc_ascii(0x0100U, 2U).c_str(), L"M_ID ASCII");
-			Assert::AreEqual("3132334142", (char*)enc_ascii(0x0102030A0BU).c_str(), L"M_KEY ASCII");
-			
-			test_natural_eq(0x0001ULL, enc_natural_from_ascii("3031", 2U), L"M_ID Hexadecimal");
-			test_natural_eq(0x0102030A0BU, enc_natural_from_ascii("3132334142", 5U), L"M_KEY Hexadecimal");
-			test_natural_eq(0x0102030408U, enc_natural_from_ascii("3132333438", 5U), L"HW_ID Hexadecimal");
+			Assert::AreEqual("3130", (char*)enc_ascii(0x10U).c_str(), L"M_ID ASCII");
+			Assert::AreEqual("3132334142", (char*)enc_ascii(0x123ABU).c_str(), L"M_KEY ASCII");
+
+			test_natural_eq(0x3031ULL, enc_natural_from_ascii("3031", 2U), L"M_ID Hexadecimal");
+			test_natural_eq(0x3132334142U, enc_natural_from_ascii("3132334142", 5U), L"M_KEY Hexadecimal");
+			test_natural_eq(0x3132333438U, enc_natural_from_ascii("3132333438", 5U), L"HW_ID Hexadecimal");
 		}
 
 		TEST_METHOD(Hexadecimal) {
-			test_natural_eq(0x0100ULL, enc_natural(0x10U), L"Literal ID -> M_ID");
-			test_natural_eq(0x0102030405U, enc_natural("12345"), L"String -> HW_ID");
-			test_natural_eq(0x0102030405U, enc_natural(0x12345), L"Literal ID -> HW_ID");
+			test_natural_eq(0x3130ULL, enc_natural(0x10U), L"Literal ID -> M_ID");
+			test_natural_eq(0x3132333435U, enc_natural("12345", 5U), L"String -> HW_ID");
+			test_natural_eq(0x3132333435U, enc_natural(0x12345), L"Literal ID -> HW_ID");
 		}
 
 		TEST_METHOD(Padding) {
@@ -70,9 +72,9 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 			Natural hw_id = enc_natural_from_ascii("3132333438", 5U);
 			Natural hw_id6 = enc_hardware_uid6(hw_id);
 
-			Assert::AreEqual(0x06ULL, hw_id6.length(), L"HW_ID6 length");
-			test_natural_eq(0x010203040801U, hw_id6, L"HW_ID -> HW_ID6");
-			Assert::AreEqual("313233343831", (char*)enc_ascii(hw_id6).c_str(), L"HW_ID6 ASCII");
+			test_natural_eq(enc_natural("12348", 5U), hw_id, "HW_ID representation");
+			test_natural_eq(0x313233343831U, hw_id6, L"HW_ID -> HW_ID6");
+			Assert::AreEqual("313233343831", (const char*)enc_ascii(hw_id6).c_str(), L"HW_ID6 ASCII");
 		}
 
 		TEST_METHOD(Encryption) {
@@ -106,8 +108,8 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 			const uint8 keysize = 8U;
 			uint8 plain[keysize];
 			uint64 eck = bf->decrypt(enc_natural_pad(cell_key).to_bytes().c_str(), 0, keysize, plain, 0U, keysize);
-
-			test_natural_eq(expected, Natural(plain), message);
+			
+			test_natural_eq(expected, enc_natural_unpad(Natural(plain)), message);
 		}
 	};
 }
