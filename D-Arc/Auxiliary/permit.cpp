@@ -36,6 +36,15 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 			Assert::AreEqual("414FA339", (char*)hexnumber(checksum_crc32("The quick brown fox jumps over the lazy dog"), 4).c_str(), L"rosettacode");
 			Assert::AreEqual(0x7E450C04UL, checksum_crc32("73871727080876A0"), L"S63 Data Protection Scheme(P12)");
 			Assert::AreEqual(780699093UL, checksum_crc32("NO4D061320000830BEB9BFE3C7C6CE68B16411FD09F96982"), L"S63 Data Protection Scheme(P50)");
+
+			{ // Accumulated CRC32
+				unsigned long acc_crc = 0;
+				
+				checksum_crc32(&acc_crc, "NO4D0613");
+				checksum_crc32(&acc_crc, "20000830");
+				
+				Assert::AreEqual(780699093UL, checksum_crc32(acc_crc, "BEB9BFE3C7C6CE68B16411FD09F96982"), L"Accumulated CRC32");
+			}
 		}
 
 		TEST_METHOD(ASCII) {
