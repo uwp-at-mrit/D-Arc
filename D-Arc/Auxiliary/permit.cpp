@@ -87,11 +87,9 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 
 		TEST_METHOD(Encryption) {
 			Natural hw_id = enc_natural_from_ascii("3132333438", 5U);
-			Natural hw_id6 = enc_hardware_uid6(hw_id);
-			BlowfishCipher bf(hw_id6.to_bytes().c_str(), hw_id6.length());
 			
-			this->test_key_encryption(&bf, 0xC1CB518E9CULL, 0xBEB9BFE3C7C6CE68ULL, "Encrypted Cell Key 1");
-			this->test_key_encryption(&bf, 0x421571CC66ULL, 0xB16411FD09F96982ULL, "Encrypted Cell Key 2");
+			test_natural_eq(0xBEB9BFE3C7C6CE68ULL, enc_cell_permit_encrypted_key(hw_id, 0xC1CB518E9CULL), "Encrypted Cell Key 1");
+			test_natural_eq(0xB16411FD09F96982ULL, enc_cell_permit_encrypted_key(hw_id, 0x421571CC66ULL), "Encrypted Cell Key 2");
 		}
 
 		TEST_METHOD(Checksum) {
@@ -116,19 +114,11 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 		}
 
 	private:
-		void test_key_encryption(BlowfishCipher* bf, uint64 cell_key, uint64 expected, Platform::String^ message) {
-			const uint8 keysize = 8U;
-			uint8 cipher[keysize];
-			uint64 eck = bf->encrypt(enc_natural_pad(cell_key).to_bytes().c_str(), 0, keysize, cipher, 0U, keysize);
-			
-			test_natural_eq(expected, Natural(cipher), message);
-		}
-
 		void test_key_decryption(BlowfishCipher* bf, uint64 cell_key, uint64 expected, Platform::String^ message) {
 			const uint8 keysize = 8U;
 			uint8 plain[keysize];
-			uint64 eck = bf->decrypt(enc_natural_pad(cell_key).to_bytes().c_str(), 0, keysize, plain, 0U, keysize);
-			
+
+			bf->decrypt(enc_natural_pad(cell_key).to_bytes().c_str(), 0, keysize, plain, 0U, keysize);
 			test_natural_eq(expected, enc_natural_unpad(Natural(plain)), message);
 		}
 	};
