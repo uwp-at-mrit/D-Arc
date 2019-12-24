@@ -61,7 +61,7 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 			test_natural_eq(0x3130ULL, enc_natural(0x10U), L"Literal ID -> M_ID");
 			test_natural_eq(0x3132333435U, enc_natural("12345", 5U), L"String -> HW_ID");
 			test_natural_eq(0x3230303030383330U, enc_natural("20000830", 8U), L"String -> DATE");
-			test_natural_eq(0x3132333435U, enc_natural(0x12345), L"Literal ID -> HW_ID");
+			test_natural_eq(0x3132333435U, enc_natural(0x12345U), L"Literal ID -> HW_ID");
 		}
 
 		TEST_METHOD(Padding) {
@@ -99,7 +99,7 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 		TEST_METHOD(Checksum) {
 			Natural eck1 = enc_cell_permit_encrypt(this->HW_ID, 0xC1CB518E9CULL);
 			Natural eck2 = enc_cell_permit_encrypt(this->HW_ID, 0x421571CC66ULL);
-			Natural checksum = enc_cell_permit_checksum("NO4D0613", 8U, 20000830U, eck1, eck2);
+			Natural checksum = enc_cell_permit_checksum("NO4D0613", 8U, 2000U, 8U, 30U, eck1, eck2);
 
 			test_natural_eq(780699093UL, checksum, L"Raw CRC32");
 			test_natural_eq(0x795C77B204F54D48ULL, enc_cell_permit_encrypt(this->HW_ID, checksum), "Encrypted CRC32");

@@ -111,7 +111,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 		}
 
 		TEST_METHOD(Fixnum) {
-			Natural xFECDBA0123456789(0xFECDBA0123456789U);
+			Natural permit(16U, "NO4D061320000830BEB9BFE3C7C6CE68B16411FD09F96982795C77B204F54D48", 16U, 64U);
 			Natural n(wch);
 			Natural zero;
 			int size16 = int(n.fixnum_count(Fixnum::Uint16));
@@ -128,8 +128,9 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 				Assert::AreEqual(v, (const uint64)n.fixnum16_ref(idx - size16), make_wstring(L"n16[%d] = %x", idx - size16, v)->Data());
 			}
 
-			Assert::AreEqual(0xFECDBA01ULL, (const uint64)xFECDBA0123456789.fixnum32_ref(0U), L"x64[0]");
-			Assert::AreEqual(0xBA012345ULL, (const uint64)xFECDBA0123456789.fixnum32_ref(-2, 2), L"x64[-2o2]");
+			Assert::AreEqual(0xBEB9BFE3C7C6CE68ULL, permit.fixnum64_ref(0), L"Cell Permit ECK1");
+			Assert::AreEqual(0x11FD09F96982795CULL, permit.fixnum64_ref(1, 2U), L"Cell Permit ECK2[+2]");
+			Assert::AreEqual(0x795C77B204F54D48ULL, permit.fixnum64_ref(-1), L"Cell Permit Checksum");
 		}
 
 		TEST_METHOD(Bytes) {

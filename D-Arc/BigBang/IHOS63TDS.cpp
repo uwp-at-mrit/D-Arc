@@ -40,7 +40,7 @@ void IHOS63TDS::reflow(float width, float height) {
 }
 
 void IHOS63TDS::load_enchart(Platform::String^ logname, Platform::String^ enchart, float width, float height) {
-	S63let* s63 = new S63let(enchart, width, height);
+	S63let* s63 = new S63let(enchart, 0x12345U, width, height);
 	unsigned int message_count = 3U;
 #ifdef _DEBUG
 	Statuslinelet* log_recv = new Statuslinelet(Log::Debug, message_count);
@@ -50,6 +50,12 @@ void IHOS63TDS::load_enchart(Platform::String^ logname, Platform::String^ enchar
 
 	log_recv->fix_width(width);
 	this->enc_licencing_log.push_back(log_recv);
+
+	if (logname->Equals("2d")) {
+		s63->set_pseudo_date(2007, 12, 15);
+	} else if (!logname->Equals("2e")){
+		s63->set_pseudo_date(2007, 12, 31);
+	}
 
 	s63->use_alternative_logger(logname);
 	s63->get_logger()->push_log_receiver(log_recv);	
