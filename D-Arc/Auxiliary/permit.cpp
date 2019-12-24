@@ -50,6 +50,7 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 		TEST_METHOD(ASCII) {
 			Assert::AreEqual("3130", (char*)enc_ascii(0x10U).c_str(), L"M_ID ASCII");
 			Assert::AreEqual("3132334142", (char*)enc_ascii(0x123ABU).c_str(), L"M_KEY ASCII");
+			Assert::AreEqual("3230303030383330", (char*)enc_ascii(0x20000830U).c_str(), L"CELL PERMIT DATE");
 
 			test_natural_eq(0x3031ULL, enc_natural_from_ascii("3031", 2U), L"M_ID Hexadecimal");
 			test_natural_eq(0x3132334142U, enc_natural_from_ascii("3132334142", 5U), L"M_KEY Hexadecimal");
@@ -59,6 +60,7 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 		TEST_METHOD(Hexadecimal) {
 			test_natural_eq(0x3130ULL, enc_natural(0x10U), L"Literal ID -> M_ID");
 			test_natural_eq(0x3132333435U, enc_natural("12345", 5U), L"String -> HW_ID");
+			test_natural_eq(0x3230303030383330U, enc_natural("20000830", 8U), L"String -> DATE");
 			test_natural_eq(0x3132333435U, enc_natural(0x12345), L"Literal ID -> HW_ID");
 		}
 
@@ -76,50 +78,39 @@ namespace WarGrey::Tamer::Auxiliary::Crypto {
 	
 	private class ENCellPermit : public TestClass<ENCellPermit> {
 	public:
-		TEST_METHOD(HW_ID6) {
-			Natural hw_id = enc_natural_from_ascii("3132333438", 5U);
-			Natural hw_id6 = enc_hardware_uid6(hw_id);
+		ENCellPermit() {
+			this->HW_ID = enc_natural_from_ascii("3132333438", 5U);
+		}
 
-			test_natural_eq(enc_natural("12348", 5U), hw_id, "HW_ID representation");
+	public:
+		TEST_METHOD(HW_ID6) {
+			Natural hw_id6 = enc_hardware_uid6(this->HW_ID);
+
+			test_natural_eq(enc_natural("12348", 5U), this->HW_ID, "HW_ID representation");
 			test_natural_eq(0x313233343831U, hw_id6, L"HW_ID -> HW_ID6");
 			Assert::AreEqual("313233343831", (const char*)enc_ascii(hw_id6).c_str(), L"HW_ID6 ASCII");
 		}
 
 		TEST_METHOD(Encryption) {
-			Natural hw_id = enc_natural_from_ascii("3132333438", 5U);
-			
-			test_natural_eq(0xBEB9BFE3C7C6CE68ULL, enc_cell_permit_encrypted_key(hw_id, 0xC1CB518E9CULL), "Encrypted Cell Key 1");
-			test_natural_eq(0xB16411FD09F96982ULL, enc_cell_permit_encrypted_key(hw_id, 0x421571CC66ULL), "Encrypted Cell Key 2");
+			test_natural_eq(0xBEB9BFE3C7C6CE68ULL, enc_cell_permit_encrypt(this->HW_ID, 0xC1CB518E9CULL), "Encrypted Cell Key 1");
+			test_natural_eq(0xB16411FD09F96982ULL, enc_cell_permit_encrypt(this->HW_ID, 0x421571CC66ULL), "Encrypted Cell Key 2");
 		}
 
 		TEST_METHOD(Checksum) {
-			const uint8 keysize = 8U;
-			uint8 cipher[keysize];
-			Natural hw_id = enc_natural_from_ascii("3132333438", 5U);
-			Natural hw_id6 = enc_hardware_uid6(hw_id);
-			BlowfishCipher bf(hw_id6.to_bytes().c_str(), hw_id6.length());
-			Natural CRC(780699093ULL);
-			uint64 ecrc = bf.encrypt(enc_natural_pad(CRC).to_bytes().c_str(), 0, keysize, cipher, 0U, keysize);
+			Natural eck1 = enc_cell_permit_encrypt(this->HW_ID, 0xC1CB518E9CULL);
+			Natural eck2 = enc_cell_permit_encrypt(this->HW_ID, 0x421571CC66ULL);
+			Natural checksum = enc_cell_permit_checksum("NO4D0613", 8U, 20000830U, eck1, eck2);
 
-			test_natural_eq(0x795C77B204F54D48ULL, Natural(cipher), "Encrypted CRC32");
+			test_natural_eq(780699093UL, checksum, L"Raw CRC32");
+			test_natural_eq(0x795C77B204F54D48ULL, enc_cell_permit_encrypt(this->HW_ID, checksum), "Encrypted CRC32");
 		}
 
 		TEST_METHOD(Decryption) {
-			Natural hw_id = enc_natural_from_ascii("3132333438", 5U);
-			Natural hw_id6 = enc_hardware_uid6(hw_id);
-			BlowfishCipher bf(hw_id6.to_bytes().c_str(), hw_id6.length());
-
-			this->test_key_decryption(&bf, 0xBEB9BFE3C7C6CE68ULL, 0xC1CB518E9CULL, "Cell Key 1");
-			this->test_key_decryption(&bf, 0xB16411FD09F96982ULL, 0x421571CC66ULL, "Cell Key 2");
+			test_natural_eq(0xC1CB518E9CULL, enc_cell_permit_decrypt(this->HW_ID, 0xBEB9BFE3C7C6CE68ULL), "Cell Key 1");
+			test_natural_eq(0x421571CC66ULL, enc_cell_permit_decrypt(this->HW_ID, 0xB16411FD09F96982ULL), "Cell Key 2");
 		}
 
 	private:
-		void test_key_decryption(BlowfishCipher* bf, uint64 cell_key, uint64 expected, Platform::String^ message) {
-			const uint8 keysize = 8U;
-			uint8 plain[keysize];
-
-			bf->decrypt(enc_natural_pad(cell_key).to_bytes().c_str(), 0, keysize, plain, 0U, keysize);
-			test_natural_eq(expected, enc_natural_unpad(Natural(plain)), message);
-		}
+		Natural HW_ID;
 	};
 }
