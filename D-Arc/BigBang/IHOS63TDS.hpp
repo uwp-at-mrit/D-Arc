@@ -17,7 +17,7 @@ namespace WarGrey::Tamer {
 		void load_enchart(Platform::String^ logname, Platform::String^ enchart, float width, float height);
 
 	private: // never deletes these graphlets manually
-		std::vector<WarGrey::SCADA::Planetlet*> enc_licencing;
-		std::vector<WarGrey::SCADA::IGraphlet*> enc_licencing_log;
+		std::map<Platform::String^, WarGrey::SCADA::Planetlet*> encs;
+		std::map<Platform::String^, WarGrey::SCADA::IGraphlet*> logs;
 	};
 }
