@@ -5,6 +5,7 @@
 #include "datum/string.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::DTPM;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
