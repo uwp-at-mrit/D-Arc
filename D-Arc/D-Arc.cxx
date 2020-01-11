@@ -41,7 +41,7 @@ internal:
 
 protected:
 	void construct(CanvasCreateResourcesReason reason) override {
-		this->push_planet(new IHOS63TDS());
+		//this->push_planet(new IHOS63TDS());
 		this->push_planet(new VisitorSpace());
 	}
 };

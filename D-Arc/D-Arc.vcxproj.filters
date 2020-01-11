@@ -56,6 +56,9 @@
     <ClCompile Include="Auxiliary\permit.cpp">
       <Filter>Auxiliary</Filter>
     </ClCompile>
+    <ClCompile Include="Auxiliary\asnder.cpp">
+      <Filter>Auxiliary</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">
