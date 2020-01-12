@@ -4,6 +4,7 @@
 
 #include "datum/string.hpp"
 #include "datum/flonum.hpp"
+#include "datum/natural.hpp"
 
 using namespace WarGrey::SCADA;
 using namespace WarGrey::DTPM;
@@ -38,18 +39,23 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 
 	private class DERPrimitive : public TestClass<DERPrimitive> {
 	public:
-		TEST_METHOD(Integer) {
+		TEST_METHOD(Fixnum) {
 			const wchar_t* msgfmt = L"Integer[%ld]";
 
-			test_primitive(0ll,    asn_integer_to_octets, asn_octets_to_integer, "\x02\x01\x00",     msgfmt);
-			test_primitive(+1ll,   asn_integer_to_octets, asn_octets_to_integer, "\x02\x01\x01",     msgfmt);
-			test_primitive(-1ll,   asn_integer_to_octets, asn_octets_to_integer, "\x02\x01\xFF",     msgfmt);
-			test_primitive(+127ll, asn_integer_to_octets, asn_octets_to_integer, "\x02\x01\x7F",     msgfmt);
-			test_primitive(-127ll, asn_integer_to_octets, asn_octets_to_integer, "\x02\x01\x81",     msgfmt);
-			test_primitive(+128ll, asn_integer_to_octets, asn_octets_to_integer, "\x02\x02\x00\x80", msgfmt);
-			test_primitive(-128ll, asn_integer_to_octets, asn_octets_to_integer, "\x02\x01\x80",     msgfmt);
-			test_primitive(+255ll, asn_integer_to_octets, asn_octets_to_integer, "\x02\x02\x00\xFF", msgfmt);
-			test_primitive(+256ll, asn_integer_to_octets, asn_octets_to_integer, "\x02\x02\x01\x00", msgfmt);
+			test_primitive(0ll,    asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x00",     msgfmt);
+			test_primitive(+1ll,   asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x01",     msgfmt);
+			test_primitive(-1ll,   asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\xFF",     msgfmt);
+			test_primitive(+127ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x7F",     msgfmt);
+			test_primitive(-127ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x81",     msgfmt);
+			test_primitive(+128ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\x80", msgfmt); // NOTE the embedded null
+			test_primitive(-128ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x80",     msgfmt);
+			test_primitive(+255ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\xFF", msgfmt);
+			test_primitive(+256ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x01\x00", msgfmt);
+		}
+
+		TEST_METHOD(Natural) {
+			test_natural("807fbc", "paded zero is an embedded null");
+			test_natural("7fbc8ce9af7a9eb54c817fc7c1c796d1b1c80bddbcbacb15942480f5aa4ee120d27f93ebcf43275d01", "17^80");
 		}
 
 		TEST_METHOD(Real) {
@@ -101,6 +107,17 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 				Assert::AreEqual(datum, restored, message->Data());
 				Assert::AreEqual(basn.size(), offset, message->Data());
 			}
+		}
+
+		void test_natural(Platform::String^ representation, const char* readable_name) {
+			Platform::String^ message = make_wstring(L"Natural[%S]", readable_name);
+			::Natural nat((uint8)16U, (const uint16*)representation->Data(), 0, representation->Length());
+			octets bnat = asn_natural_to_octets(nat);
+			size_t offset = 0;
+			::Natural restored = asn_octets_to_natural(bnat, &offset);
+			
+			Assert::IsTrue(nat == restored, message->Data());
+			Assert::AreEqual(bnat.size(), offset, message->Data());
 		}
 
 		void test_real(double real, const char* representation) {
