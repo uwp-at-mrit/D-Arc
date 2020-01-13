@@ -92,6 +92,15 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			test_real(-15.625, "\x09\x03\xC0\xFD\x7D");
 		}
 
+		TEST_METHOD(String) {
+			test_string(std::string("6.0.5361.2"), asn_ia5_to_octets, asn_octets_to_ia5, L"String IA5[%S]");
+		}
+
+		TEST_METHOD(Miscellaneous) {
+			test_primitive(true,    asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\xFF", L"Boolean %d");
+			test_primitive(false,   asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\x00", L"Boolean %d");
+		}
+
 	private:
 		template<typename T, typename T2O, typename O2T> 
 		void test_primitive(T datum, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
@@ -140,6 +149,17 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 
 				Assert::AreEqual(breal.size(), offset, message->Data());
 			}
+		}
+
+		template<typename T, typename T2O, typename O2T> 
+		void test_string(T& datum, T2O asn_to_octets, O2T octets_to_asn, const wchar_t* msgfmt) {
+			Platform::String^ message = make_wstring(msgfmt, datum);
+			octets basn = asn_to_octets(datum);
+			size_t offset = 0;
+			T restored = octets_to_asn(basn, &offset);
+
+			Assert::AreEqual((const char*)datum.c_str(), (const char*)restored.c_str(), message->Data());
+			Assert::AreEqual(basn.size(), offset, message->Data());
 		}
 	};
 }
