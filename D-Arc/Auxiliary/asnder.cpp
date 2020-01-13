@@ -1,4 +1,4 @@
-#include "CppUnitTest.h"
+﻿#include "CppUnitTest.h"
 
 #include "asn/der.hpp"
 
@@ -13,10 +13,14 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
 namespace WarGrey::Tamer::Auxiliary::ASN1 {
+	static octets asn_utf_8_to_octets(std::wstring& str) {
+		return asn_utf8_to_octets(str);
+	}
+
 	static void assert(octets& n, const char* control, Platform::String^ message) {
 		Assert::AreEqual((const char*)(n.c_str()), control, message->Data());
 	}
-	
+
 	private class DERBase : public TestClass<DERBase> {
 	public:
 		TEST_METHOD(Length) {
@@ -93,7 +97,11 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		}
 
 		TEST_METHOD(String) {
-			test_string(std::string("6.0.5361.2"), asn_ia5_to_octets, asn_octets_to_ia5, L"String IA5[%S]");
+			test_string(std::string("6.0.5361.2"), asn_ia5_to_octets, asn_octets_to_ia5,
+				"\x16\x0A\x36\x2E\x30\x2E\x35\x33\x36\x31\x2E\x32", L"String IA5[%S]");
+
+			test_string(std::wstring(L"λsh\nssh"), asn_utf_8_to_octets, asn_octets_to_utf8,
+				"\x0C\x08\xCE\xBB\x73\x68\x0A\x73\x73\x68", L"String UTF8[%s]");
 		}
 
 		TEST_METHOD(Miscellaneous) {
@@ -152,14 +160,19 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		}
 
 		template<typename T, typename T2O, typename O2T> 
-		void test_string(T& datum, T2O asn_to_octets, O2T octets_to_asn, const wchar_t* msgfmt) {
-			Platform::String^ message = make_wstring(msgfmt, datum);
+		void test_string(T& datum, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
+			Platform::String^ message = make_wstring(msgfmt, datum.c_str());
 			octets basn = asn_to_octets(datum);
-			size_t offset = 0;
-			T restored = octets_to_asn(basn, &offset);
 
-			Assert::AreEqual((const char*)datum.c_str(), (const char*)restored.c_str(), message->Data());
-			Assert::AreEqual(basn.size(), offset, message->Data());
+			Assert::AreEqual(representation, (const char*)basn.c_str(), message->Data());
+
+			{ // decode
+				size_t offset = 0;
+				T restored = octets_to_asn(basn, &offset);
+
+				Assert::AreEqual(datum.c_str(), restored.c_str(), message->Data());
+				Assert::AreEqual(basn.size(), offset, message->Data());
+			}
 		}
 	};
 }
