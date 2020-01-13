@@ -17,10 +17,14 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		return asn_utf8_to_octets(str);
 	}
 
+	define_asn_enum(ASNOrder, order, zero, first, second, third, forth);
+
+	/*********************************************************************************************/
 	static void assert(octets& n, const char* control, Platform::String^ message) {
 		Assert::AreEqual((const char*)(n.c_str()), control, message->Data());
 	}
 
+	/*********************************************************************************************/
 	private class DERBase : public TestClass<DERBase> {
 	public:
 		TEST_METHOD(Length) {
@@ -96,12 +100,20 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			test_real(-15.625, "\x09\x03\xC0\xFD\x7D");
 		}
 
+		TEST_METHOD(Enumerated) {
+			const wchar_t* msgfmt = L"Enumerated Order [%s]";
+
+			test_enum(ASNOrder::zero,  asn_order_to_octets, asn_octets_to_order, "\x0A\x01\x00", msgfmt);
+			test_enum(ASNOrder::forth, asn_order_to_octets, asn_octets_to_order, "\x0A\x01\x04", msgfmt);
+		}
+
 		TEST_METHOD(String) {
 			test_string(std::string("6.0.5361.2"), asn_ia5_to_octets, asn_octets_to_ia5,
 				"\x16\x0A\x36\x2E\x30\x2E\x35\x33\x36\x31\x2E\x32", L"String IA5[%S]");
 
-			test_string(std::wstring(L"λsh\nssh"), asn_utf_8_to_octets, asn_octets_to_utf8,
-				"\x0C\x08\xCE\xBB\x73\x68\x0A\x73\x73\x68", L"String UTF8[%s]");
+			// WARNING: std::string can contain embedded '\0',  but be careful when making it with char-array literal.
+			test_string(std::wstring(L"λsh\x0\nssh", 8), asn_utf_8_to_octets, asn_octets_to_utf8,
+				"\x0C\x09\xCE\xBB\x73\x68\x00\x0A\x73\x73\x68", L"String UTF8[%s]");
 		}
 
 		TEST_METHOD(Miscellaneous) {
@@ -154,8 +166,21 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 				} else {
 					Assert::AreEqual(real, restored, message->Data());
 				}
+			}
+		}
 
-				Assert::AreEqual(breal.size(), offset, message->Data());
+		template<typename T, typename T2O, typename O2T>
+		void test_enum(T datum, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
+			Platform::String^ message = make_wstring(msgfmt, datum.ToString()->Data());
+			octets basn = asn_to_octets(datum);
+
+			Assert::AreEqual(representation, (const char*)(basn.c_str()), message->Data());
+
+			{ // decode
+				size_t offset = 0;
+				T restored = octets_to_asn(basn, &offset);
+
+				Assert::IsTrue(datum == restored, message->Data());
 			}
 		}
 
@@ -171,7 +196,6 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 				T restored = octets_to_asn(basn, &offset);
 
 				Assert::AreEqual(datum.c_str(), restored.c_str(), message->Data());
-				Assert::AreEqual(basn.size(), offset, message->Data());
 			}
 		}
 	};
