@@ -17,6 +17,10 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		return asn_utf8_to_octets(str);
 	}
 
+	static size_t asn_utf_8_span(std::wstring& str) {
+		return asn_utf8_span(str);
+	}
+
 	define_asn_enum(ASNOrder, order, zero, first, second, third, forth);
 
 	/*********************************************************************************************/
@@ -42,6 +46,7 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			assert(length, control, make_wstring(L"length %d", size));
 			Assert::AreEqual(size, asn_octets_to_length(length, &offset), make_wstring(L"length[%d] size", size)->Data());
 			Assert::AreEqual(length.size(), offset, make_wstring(L"length[%d] offset", size)->Data());
+			Assert::AreEqual(asn_length_span(size), offset, make_wstring(L"length[%d] span", size)->Data());
 		}
 	};
 
@@ -50,15 +55,15 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		TEST_METHOD(Fixnum) {
 			const wchar_t* msgfmt = L"Integer[%ld]";
 
-			test_primitive(0ll,    asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x00",     msgfmt);
-			test_primitive(+1ll,   asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x01",     msgfmt);
-			test_primitive(-1ll,   asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\xFF",     msgfmt);
-			test_primitive(+127ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x7F",     msgfmt);
-			test_primitive(-127ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x81",     msgfmt);
-			test_primitive(+128ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\x80", msgfmt); // NOTE the embedded null
-			test_primitive(-128ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x80",     msgfmt);
-			test_primitive(+255ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\xFF", msgfmt);
-			test_primitive(+256ll, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x01\x00", msgfmt);
+			test_primitive(0ll,    asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x00",     msgfmt);
+			test_primitive(+1ll,   asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x01",     msgfmt);
+			test_primitive(-1ll,   asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\xFF",     msgfmt);
+			test_primitive(+127ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x7F",     msgfmt);
+			test_primitive(-127ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x81",     msgfmt);
+			test_primitive(+128ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\x80", msgfmt); // NOTE the embedded null
+			test_primitive(-128ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x80",     msgfmt);
+			test_primitive(+255ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\xFF", msgfmt);
+			test_primitive(+256ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x01\x00", msgfmt);
 		}
 
 		TEST_METHOD(Natural) {
@@ -108,26 +113,27 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		}
 
 		TEST_METHOD(String) {
-			test_string(std::string("6.0.5361.2"), asn_ia5_to_octets, asn_octets_to_ia5,
+			test_string(std::string("6.0.5361.2"), asn_ia5_span, asn_ia5_to_octets, asn_octets_to_ia5,
 				"\x16\x0A\x36\x2E\x30\x2E\x35\x33\x36\x31\x2E\x32", L"String IA5[%S]");
 
 			// WARNING: std::string can contain embedded '\0',  but be careful when making it with char-array literal.
-			test_string(std::wstring(L"λsh\x0\nssh", 8), asn_utf_8_to_octets, asn_octets_to_utf8,
+			test_string(std::wstring(L"λsh\x0\nssh", 8), asn_utf_8_span, asn_utf_8_to_octets, asn_octets_to_utf8,
 				"\x0C\x09\xCE\xBB\x73\x68\x00\x0A\x73\x73\x68", L"String UTF8[%s]");
 		}
 
 		TEST_METHOD(Miscellaneous) {
-			test_primitive(true,    asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\xFF", L"Boolean %d");
-			test_primitive(false,   asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\x00", L"Boolean %d");
+			test_primitive(true,  asn_boolean_span, asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\xFF", L"Boolean %d");
+			test_primitive(false, asn_boolean_span, asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\x00", L"Boolean %d");
 		}
 
 	private:
-		template<typename T, typename T2O, typename O2T> 
-		void test_primitive(T datum, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
+		template<typename T, typename Span, typename T2O, typename O2T> 
+		void test_primitive(T datum, Span span, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
 			Platform::String^ message = make_wstring(msgfmt, datum);
 			octets basn = asn_to_octets(datum);
 
 			Assert::AreEqual(representation, (const char*)(basn.c_str()), message->Data());
+			Assert::AreEqual(basn.size(), asn_span(span, datum), message->Data());
 
 			{ // decode
 				size_t offset = 0;
@@ -142,11 +148,10 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			Platform::String^ message = make_wstring(L"Natural[%S]", readable_name);
 			::Natural nat((uint8)16U, (const uint16*)representation->Data(), 0, representation->Length());
 			octets bnat = asn_natural_to_octets(nat);
-			size_t offset = 0;
-			::Natural restored = asn_octets_to_natural(bnat, &offset);
+			::Natural restored = asn_octets_to_natural(bnat);
 			
 			Assert::IsTrue(nat == restored, message->Data());
-			Assert::AreEqual(bnat.size(), offset, message->Data());
+			Assert::AreEqual(bnat.size(), asn_span(asn_natural_span, nat), message->Data());
 		}
 
 		void test_real(double real, const char* representation) {
@@ -154,6 +159,7 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			octets breal = asn_real_to_octets(real);
 
 			Assert::AreEqual(representation, (const char*)(breal.c_str()), message->Data());
+			Assert::AreEqual(breal.size(), asn_span(asn_real_span, real), message->Data());
 
 			{ // decode
 				size_t offset = 0;
@@ -177,23 +183,22 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			Assert::AreEqual(representation, (const char*)(basn.c_str()), message->Data());
 
 			{ // decode
-				size_t offset = 0;
-				T restored = octets_to_asn(basn, &offset);
+				T restored = octets_to_asn(basn, nullptr);
 
 				Assert::IsTrue(datum == restored, message->Data());
 			}
 		}
 
-		template<typename T, typename T2O, typename O2T> 
-		void test_string(T& datum, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
+		template<typename T, typename Span, typename T2O, typename O2T> 
+		void test_string(T& datum, Span span, T2O asn_to_octets, O2T octets_to_asn, const char* representation, const wchar_t* msgfmt) {
 			Platform::String^ message = make_wstring(msgfmt, datum.c_str());
 			octets basn = asn_to_octets(datum);
 
 			Assert::AreEqual(representation, (const char*)basn.c_str(), message->Data());
+			Assert::AreEqual(basn.size(), asn_span(span, datum), message->Data());
 
 			{ // decode
-				size_t offset = 0;
-				T restored = octets_to_asn(basn, &offset);
+				T restored = octets_to_asn(basn, nullptr);
 
 				Assert::AreEqual(datum.c_str(), restored.c_str(), message->Data());
 			}
