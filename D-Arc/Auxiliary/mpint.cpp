@@ -89,7 +89,7 @@ namespace WarGrey::Tamer::Auxiliary::MPNatural {
 			for (int idx = 0; idx < nsize; idx++) {
 				Assert::AreEqual(ch[idx], n[idx], make_wstring(L"n[%d] = %x", idx, ch[idx])->Data());
 				Assert::AreEqual(ch[idx], n[idx - nsize], make_wstring(L"n[%d] = %x", idx - nsize, ch[idx])->Data());
-				Assert::AreEqual((uintptr_t*)(&n[idx]), (uintptr_t*)(&n[idx - nsize]), make_wstring(L"localtion of n[%d]", idx)->Data());
+				Assert::AreEqual((uintptr_t*)(&n[idx]), (uintptr_t*)(&n[idx - nsize]), make_wstring(L"location of n[%d]", idx)->Data());
 			}
 		}
 

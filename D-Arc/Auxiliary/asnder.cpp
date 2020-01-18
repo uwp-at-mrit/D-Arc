@@ -152,6 +152,9 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			
 			Assert::IsTrue(nat == restored, message->Data());
 			Assert::AreEqual(bnat.size(), asn_span(asn_natural_span, nat), message->Data());
+
+			asn_natural_into_octets(nat, (uint8*)bnat.c_str(), 0);
+			Assert::IsTrue(nat == asn_octets_to_natural(bnat), message->Data());
 		}
 
 		void test_real(double real, const char* representation) {
@@ -160,6 +163,9 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 
 			Assert::AreEqual(representation, (const char*)(breal.c_str()), message->Data());
 			Assert::AreEqual(breal.size(), asn_span(asn_real_span, real), message->Data());
+
+			asn_real_into_octets(real, (uint8*)breal.c_str(), 0);
+			Assert::AreEqual(representation, (const char*)(breal.c_str()), message->Data());
 
 			{ // decode
 				size_t offset = 0;
