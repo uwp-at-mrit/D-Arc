@@ -6,6 +6,8 @@
 #include "datum/flonum.hpp"
 #include "datum/natural.hpp"
 
+#include "syslog.hpp"
+
 using namespace WarGrey::SCADA;
 using namespace WarGrey::DTPM;
 
@@ -21,11 +23,84 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		return asn_utf8_span(str);
 	}
 
-	define_asn_enum(ASNOrder, order, zero, first, second, third, forth);
+	define_asn_enum(order, ASNOrder, zero, first, second, third, forth);
+	define_asn_enum(gender, ASNGender, unknown, male, female);
+
+	private struct Person : public IASNSequence {
+	public:
+		Person(std::string& name, ASNGender gender, int age, double height)
+			: IASNSequence(4), name(name), gender(gender), age(age), height(height) {}
+
+		Person(octets& basn, size_t* offset = nullptr) : IASNSequence(4) {
+			this->from_octets(basn, offset);
+		}
+
+	public:
+		std::string name;
+		ASNGender gender;
+		int age;
+		double height;
+
+	protected:
+		size_t field_payload_span(size_t idx) override {
+			size_t span = 0;
+
+			switch (idx) {
+			case 0: span = asn_ia5_span(this->name); break;
+			case 1: span = asn_gender_span(this->gender); break;
+			case 2: span = asn_fixnum_span(this->age); break;
+			case 3: span = asn_real_span(this->height); break;
+			}
+
+			return span;
+		}
+
+		size_t fill_field(size_t idx, uint8* octets, size_t offset) override {
+			switch (idx) {
+			case 0: offset = asn_ia5_into_octets(this->name, octets, offset); break;
+			case 1: offset = asn_gender_into_octets(this->gender, octets, offset); break;
+			case 2: offset = asn_fixnum_into_octets(this->age, octets, offset); break;
+			case 3: offset = asn_real_into_octets(this->height, octets, offset); break;
+			}
+
+			return offset;
+		}
+
+		void extract_field(size_t idx, octets& basn, size_t* offset) override {
+			switch (idx) {
+			case 0: this->name = asn_octets_to_ia5(basn, offset); break;
+			case 1: this->gender = asn_octets_to_gender(basn, offset); break;
+			case 2: this->age = (int)(asn_octets_to_fixnum(basn, offset)); break;
+			case 3: this->height = asn_octets_to_real(basn, offset); break;
+			}
+		}
+	};
 
 	/*********************************************************************************************/
+	static bool bytes_eq(const char* b10, const uint8* b2, size_t size, Platform::String^ message) {
+		uint8* b1 = (uint8*)b10;
+		bool eq = true;
+
+		for (size_t i = 0; i < size; i++) {
+			if (b1[i] != b2[i]) {
+				eq = false;
+				break;
+			}
+		}
+
+		if (!eq) {
+			syslog(Log::Error, L"BytesEq: %s:", message->Data());
+
+			for (size_t i = 0; i < size; i++) {
+				syslog(Log::Error, L"  [%02d] exptected: %02X, given: %02X", i, b1[i], b2[i]);
+			}
+		}
+
+		return eq;
+	}
+
 	static void assert(octets& n, const char* control, Platform::String^ message) {
-		Assert::AreEqual((const char*)(n.c_str()), control, message->Data());
+		Assert::IsTrue(bytes_eq(control, n.c_str(), n.size(), message), message->Data());
 	}
 
 	/*********************************************************************************************/
@@ -103,6 +178,7 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 
 			test_real(-0.0015625, "\x09\x09\xC0\xC3\x0C\xCC\xCC\xCC\xCC\xCC\xCD");
 			test_real(-15.625, "\x09\x03\xC0\xFD\x7D");
+			test_real(180.0, "\x09\x04\x80\x00\x00\xB4");
 		}
 
 		TEST_METHOD(Enumerated) {
@@ -132,7 +208,7 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			Platform::String^ message = make_wstring(msgfmt, datum);
 			octets basn = asn_to_octets(datum);
 
-			Assert::AreEqual(representation, (const char*)(basn.c_str()), message->Data());
+			Assert::IsTrue(bytes_eq(representation, basn.c_str(), basn.size(), message), message->Data());
 			Assert::AreEqual(basn.size(), asn_span(span, datum), message->Data());
 
 			{ // decode
@@ -161,11 +237,11 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			Platform::String^ message = make_wstring(L"Real[%lf]", real);
 			octets breal = asn_real_to_octets(real);
 
-			Assert::AreEqual(representation, (const char*)(breal.c_str()), message->Data());
+			Assert::IsTrue(bytes_eq(representation, breal.c_str(), breal.size(), message), message->Data());
 			Assert::AreEqual(breal.size(), asn_span(asn_real_span, real), message->Data());
 
 			asn_real_into_octets(real, (uint8*)breal.c_str(), 0);
-			Assert::AreEqual(representation, (const char*)(breal.c_str()), message->Data());
+			Assert::IsTrue(bytes_eq(representation, breal.c_str(), breal.size(), message), message->Data());
 
 			{ // decode
 				size_t offset = 0;
@@ -186,7 +262,7 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			Platform::String^ message = make_wstring(msgfmt, datum.ToString()->Data());
 			octets basn = asn_to_octets(datum);
 
-			Assert::AreEqual(representation, (const char*)(basn.c_str()), message->Data());
+			Assert::IsTrue(bytes_eq(representation, basn.c_str(), basn.size(), message), message->Data());
 
 			{ // decode
 				T restored = octets_to_asn(basn, nullptr);
@@ -200,13 +276,41 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			Platform::String^ message = make_wstring(msgfmt, datum.c_str());
 			octets basn = asn_to_octets(datum);
 
-			Assert::AreEqual(representation, (const char*)basn.c_str(), message->Data());
+			Assert::IsTrue(bytes_eq(representation, basn.c_str(), basn.size(), message), message->Data());
 			Assert::AreEqual(basn.size(), asn_span(span, datum), message->Data());
 
 			{ // decode
 				T restored = octets_to_asn(basn, nullptr);
 
 				Assert::AreEqual(datum.c_str(), restored.c_str(), message->Data());
+			}
+		}
+	};
+
+	private class DERSequence : public TestClass<DERSequence> {
+	public:
+		TEST_METHOD(PlainSequence) {
+			Person person(std::string("Smith"), ASNGender::male, 42, 180.0);
+
+			test_person(person, "\x30\x13\x16\x05\x53\x6d\x69\x74\x68\x0a\x01\x01\x02\x01\x2a\x09\x04\x80\x00\x00\xb4");
+		}
+
+	private:
+		void test_person(Person& p, const char* representation) {
+			Platform::String^ message = make_wstring(L"%S", p.name.c_str());
+			octets basn = p.to_octets();
+			
+			Assert::IsTrue(bytes_eq(representation, basn.c_str(), basn.size(), message), message->Data());
+			Assert::AreEqual(asn_span(&p), basn.size(), make_wstring(L"%S span", p.name.c_str())->Data());
+
+			{ // decode
+				size_t offset = 0;
+				Person restored(basn, &offset);
+
+				Assert::AreEqual(p.name.c_str(), restored.name.c_str(), make_wstring(L"%S name", p.name.c_str())->Data());
+				Assert::IsTrue(p.gender == restored.gender, make_wstring(L"%S gender", p.name.c_str())->Data());
+				Assert::AreEqual(p.age, restored.age, make_wstring(L"%S age", p.name.c_str())->Data());
+				Assert::AreEqual(p.height, restored.height, make_wstring(L"%S height", p.name.c_str())->Data());
 			}
 		}
 	};
