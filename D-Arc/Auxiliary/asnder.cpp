@@ -15,16 +15,36 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
 namespace WarGrey::Tamer::Auxiliary::ASN1 {
-	static octets asn_utf_8_to_octets(std::wstring& str) {
-		return asn_utf8_to_octets(str);
-	}
+	define_asn_enum(order, ASNOrder, zero, first, second, third, forth);
+	define_asn_enum(gender, ASNGender, unknown, male, female);
 
 	static size_t asn_utf_8_span(std::wstring& str) {
 		return asn_utf8_span(str);
 	}
 
-	define_asn_enum(order, ASNOrder, zero, first, second, third, forth);
-	define_asn_enum(gender, ASNGender, unknown, male, female);
+	static octets asn_utf_8_to_octets(std::wstring& str) {
+		return asn_utf8_to_octets(str);
+	}
+
+	static std::wstring asn_bytes_to_utf8(octets& bint, size_t* offset = nullptr) {
+		return asn_octets_to_utf8(bint, offset);
+	}
+
+	static long long asn_bytes_to_fixnum(octets& bint, size_t* offset = nullptr) {
+		return asn_octets_to_fixnum(bint, offset);
+	}
+
+	static bool asn_bytes_to_boolean(octets& bint, size_t* offset = nullptr) {
+		return asn_octets_to_boolean(bint, offset);
+	}
+
+	static std::string asn_bytes_to_ia5(octets& bint, size_t* offset = nullptr) {
+		return asn_octets_to_ia5(bint, offset);
+	}
+
+	static ASNOrder asn_bytes_to_order(octets& bint, size_t* offset = nullptr) {
+		return asn_octets_to_order(bint, offset);
+	}
 
 	private struct Person : public IASNSequence {
 	public:
@@ -66,7 +86,7 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 			return offset;
 		}
 
-		void extract_field(size_t idx, octets& basn, size_t* offset) override {
+		void extract_field(size_t idx, const uint8* basn, size_t* offset) override {
 			switch (idx) {
 			case 0: this->name = asn_octets_to_ia5(basn, offset); break;
 			case 1: this->gender = asn_octets_to_gender(basn, offset); break;
@@ -130,15 +150,15 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		TEST_METHOD(Fixnum) {
 			const wchar_t* msgfmt = L"Integer[%ld]";
 
-			test_primitive(0ll,    asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x00",     msgfmt);
-			test_primitive(+1ll,   asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x01",     msgfmt);
-			test_primitive(-1ll,   asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\xFF",     msgfmt);
-			test_primitive(+127ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x7F",     msgfmt);
-			test_primitive(-127ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x81",     msgfmt);
-			test_primitive(+128ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\x80", msgfmt); // NOTE the embedded null
-			test_primitive(-128ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x01\x80",     msgfmt);
-			test_primitive(+255ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x00\xFF", msgfmt);
-			test_primitive(+256ll, asn_fixnum_span, asn_fixnum_to_octets, asn_octets_to_fixnum, "\x02\x02\x01\x00", msgfmt);
+			test_primitive(0ll,    asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x01\x00",     msgfmt);
+			test_primitive(+1ll,   asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x01\x01",     msgfmt);
+			test_primitive(-1ll,   asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x01\xFF",     msgfmt);
+			test_primitive(+127ll, asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x01\x7F",     msgfmt);
+			test_primitive(-127ll, asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x01\x81",     msgfmt);
+			test_primitive(+128ll, asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x02\x00\x80", msgfmt); // NOTE the embedded null
+			test_primitive(-128ll, asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x01\x80",     msgfmt);
+			test_primitive(+255ll, asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x02\x00\xFF", msgfmt);
+			test_primitive(+256ll, asn_fixnum_span, asn_fixnum_to_octets, asn_bytes_to_fixnum, "\x02\x02\x01\x00", msgfmt);
 		}
 
 		TEST_METHOD(Natural) {
@@ -184,22 +204,22 @@ namespace WarGrey::Tamer::Auxiliary::ASN1 {
 		TEST_METHOD(Enumerated) {
 			const wchar_t* msgfmt = L"Enumerated Order [%s]";
 
-			test_enum(ASNOrder::zero,  asn_order_to_octets, asn_octets_to_order, "\x0A\x01\x00", msgfmt);
-			test_enum(ASNOrder::forth, asn_order_to_octets, asn_octets_to_order, "\x0A\x01\x04", msgfmt);
+			test_enum(ASNOrder::zero,  asn_order_to_octets, asn_bytes_to_order, "\x0A\x01\x00", msgfmt);
+			test_enum(ASNOrder::forth, asn_order_to_octets, asn_bytes_to_order, "\x0A\x01\x04", msgfmt);
 		}
 
 		TEST_METHOD(String) {
-			test_string(std::string("6.0.5361.2"), asn_ia5_span, asn_ia5_to_octets, asn_octets_to_ia5,
+			test_string(std::string("6.0.5361.2"), asn_ia5_span, asn_ia5_to_octets, asn_bytes_to_ia5,
 				"\x16\x0A\x36\x2E\x30\x2E\x35\x33\x36\x31\x2E\x32", L"String IA5[%S]");
 
 			// WARNING: std::string can contain embedded '\0',  but be careful when making it with char-array literal.
-			test_string(std::wstring(L"λsh\x0\nssh", 8), asn_utf_8_span, asn_utf_8_to_octets, asn_octets_to_utf8,
+			test_string(std::wstring(L"λsh\x0\nssh", 8), asn_utf_8_span, asn_utf_8_to_octets, asn_bytes_to_utf8,
 				"\x0C\x09\xCE\xBB\x73\x68\x00\x0A\x73\x73\x68", L"String UTF8[%s]");
 		}
 
 		TEST_METHOD(Miscellaneous) {
-			test_primitive(true,  asn_boolean_span, asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\xFF", L"Boolean %d");
-			test_primitive(false, asn_boolean_span, asn_boolean_to_octets, asn_octets_to_boolean, "\x01\x01\x00", L"Boolean %d");
+			test_primitive(true,  asn_boolean_span, asn_boolean_to_octets, asn_bytes_to_boolean, "\x01\x01\xFF", L"Boolean %d");
+			test_primitive(false, asn_boolean_span, asn_boolean_to_octets, asn_bytes_to_boolean, "\x01\x01\x00", L"Boolean %d");
 		}
 
 	private:
