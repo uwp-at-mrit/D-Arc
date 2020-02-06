@@ -9,7 +9,7 @@ using namespace WarGrey::GYDM;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
-namespace WarGrey::Tamer::Auxiliary::MPNatural {
+namespace WarGrey::Tamer::Jargon::MPNatural {
 	static void assert(Natural& n, const char* representation, size_t size, size_t bits, Platform::String^ message) {
 		Assert::AreEqual(representation, (const char*)n.to_hexstring().c_str(), message->Data());
 		Assert::AreEqual(size, n.length(), (message + "[size]")->Data());

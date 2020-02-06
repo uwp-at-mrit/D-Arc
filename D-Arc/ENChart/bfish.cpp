@@ -174,7 +174,7 @@ static bool bytes_eq(uint8* b1, uint8* b2, size_t size) {
 }
 
 /**************************************************************************************************/
-namespace WarGrey::Tamer::Auxiliary::Crypto {
+namespace WarGrey::Tamer::ENChart::Crypto {
 	private class Blowfish : public TestClass<Blowfish> {
 	public:
 		TEST_METHOD(Subkey) {

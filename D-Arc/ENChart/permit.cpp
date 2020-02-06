@@ -13,7 +13,7 @@ using namespace WarGrey::DTPM;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /**************************************************************************************************/
-namespace WarGrey::Tamer::Auxiliary::Crypto {
+namespace WarGrey::Tamer::ENChart::Crypto {
 	static void test_bytes(bytes& expected, bytes& actual, Platform::String^ message) {
 		Assert::AreEqual((const char*)expected.c_str(), (const char*)actual.c_str(), message->Data());
 	}
