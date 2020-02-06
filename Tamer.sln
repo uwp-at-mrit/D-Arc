@@ -22,6 +22,7 @@ Global
 		Auxiliary\Auxiliary.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
 		BigBang\BigBang.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
 		Graphics\graphics.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
+		Jargon\Jargon.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
 		WormHole\WormHole.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
 		Jargon\Jargon.vcxitems*{948de949-b0ce-4469-8978-eab344e9da71}*SharedItemsImports = 9
 		Auxiliary\Auxiliary.vcxitems*{9d38ad51-fee8-4303-8b0d-833bbcc93b58}*SharedItemsImports = 9

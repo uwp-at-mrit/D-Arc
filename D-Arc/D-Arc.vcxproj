@@ -107,6 +107,7 @@
     <Import Project="..\BigBang\BigBang.vcxitems" Label="Shared" />
     <Import Project="..\Graphics\graphics.vcxitems" Label="Shared" />
     <Import Project="..\WormHole\WormHole.vcxitems" Label="Shared" />
+    <Import Project="..\Jargon\Jargon.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -274,7 +275,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Auxiliary\bfish.cpp" />
-    <ClCompile Include="Auxiliary\asnder.cpp" />
     <ClCompile Include="Auxiliary\permit.cpp" />
     <ClCompile Include="Auxiliary\mpint.cpp" />
     <ClCompile Include="BigBang\cyberspace.cpp" />
@@ -282,6 +282,7 @@
     <ClCompile Include="BigBang\visitor.cpp" />
     <ClCompile Include="Graphics\colorspace_convertion.cpp" />
     <ClCompile Include="D-Arc.cxx" />
+    <ClCompile Include="Jargon\asnder.cpp" />
     <ClCompile Include="WormHole\mbtest.cpp" />
   </ItemGroup>
   <ItemGroup>

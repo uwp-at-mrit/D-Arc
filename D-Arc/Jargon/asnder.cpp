@@ -9,12 +9,12 @@
 #include "syslog.hpp"
 
 using namespace WarGrey::SCADA;
-using namespace WarGrey::DTPM;
+using namespace WarGrey::GYDM;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
-namespace WarGrey::Tamer::Auxiliary::ASN1 {
+namespace WarGrey::Tamer::Jargon::ASN1 {
 	define_asn_enum(order, ASNOrder, zero, first, second, third, forth);
 	define_asn_enum(gender, ASNGender, unknown, male, female);
 

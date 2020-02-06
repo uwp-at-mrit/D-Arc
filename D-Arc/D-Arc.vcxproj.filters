@@ -29,6 +29,9 @@
     <Filter Include="Auxiliary">
       <UniqueIdentifier>{bf8ea7bf-8b6a-4e73-bdea-bea1ec5c4d02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Jargon">
+      <UniqueIdentifier>{00bb9317-91e6-437a-bfa0-955b5dd2db88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BigBang\cyberspace.cpp">
@@ -56,8 +59,8 @@
     <ClCompile Include="Auxiliary\permit.cpp">
       <Filter>Auxiliary</Filter>
     </ClCompile>
-    <ClCompile Include="Auxiliary\asnder.cpp">
-      <Filter>Auxiliary</Filter>
+    <ClCompile Include="Jargon\asnder.cpp">
+      <Filter>Jargon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
