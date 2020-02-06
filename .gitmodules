@@ -10,3 +10,6 @@
 [submodule "WormHole"]
 	path = WormHole
 	url = https://github.com/uwp-at-mrit/WormHole.git
+[submodule "Jargon"]
+	path = Jargon
+	url = https://github.com/uwp-at-mrit/Jargon.git

@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WormHole", "WormHole\WormHo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D-Arc", "D-Arc\D-Arc.vcxproj", "{93A8A92F-6B0D-4B67-BB72-FCAFD39266F0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Jargon", "Jargon\Jargon.vcxitems", "{948DE949-B0CE-4469-8978-EAB344E9DA71}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		BigBang\BigBang.vcxitems*{6a826f3b-23f9-432c-86bd-f9d318096966}*SharedItemsImports = 9
@@ -21,6 +23,7 @@ Global
 		BigBang\BigBang.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
 		Graphics\graphics.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
 		WormHole\WormHole.vcxitems*{93a8a92f-6b0d-4b67-bb72-fcafd39266f0}*SharedItemsImports = 4
+		Jargon\Jargon.vcxitems*{948de949-b0ce-4469-8978-eab344e9da71}*SharedItemsImports = 9
 		Auxiliary\Auxiliary.vcxitems*{9d38ad51-fee8-4303-8b0d-833bbcc93b58}*SharedItemsImports = 9
 		WormHole\WormHole.vcxitems*{a218bf46-1f55-4b99-b000-62f2de40576c}*SharedItemsImports = 9
 	EndGlobalSection
