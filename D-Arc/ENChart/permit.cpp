@@ -1,8 +1,9 @@
 #include "CppUnitTest.h"
 
 #include "crypto/enckey.hpp"
-#include "crypto/checksum.hpp"
 #include "crypto/blowfish.hpp"
+
+#include "checksum/crc32.hpp"
 
 #include "datum/string.hpp"
 
