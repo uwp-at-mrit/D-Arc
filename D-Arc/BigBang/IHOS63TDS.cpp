@@ -61,7 +61,7 @@ void IHOS63TDS::load_enchart(Platform::String^ logname, Platform::String^ enchar
 	unsigned int message_count = 4U;
 #ifdef _DEBUG
 	Statuslinelet* log_recv = new Statuslinelet(Log::Debug, message_count);
-#elif
+#else
 	Statuslinelet* log_recv = new Statuslinelet(Log::Info, message_count);
 #endif // _DEBUG
 

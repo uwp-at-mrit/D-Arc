@@ -284,6 +284,7 @@
     <ClCompile Include="D-Arc.cxx" />
     <ClCompile Include="Jargon\asnder.cpp" />
     <ClCompile Include="Jargon\mpint.cpp" />
+    <ClCompile Include="Schema\datahole.cpp" />
     <ClCompile Include="WormHole\mbtest.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +304,11 @@
   <ItemGroup>
     <PRIResource Include="stone\tongue\en-US\tongue.resw" />
     <PRIResource Include="stone\tongue\zh-CN\tongue.resw" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataHole\DataHole.csproj">
+      <Project>{efbf0eeb-1879-42a4-9294-37995ba975de}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

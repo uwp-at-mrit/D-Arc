@@ -32,6 +32,9 @@
     <Filter Include="ENChart">
       <UniqueIdentifier>{63102573-f8de-4b79-a28b-278261ee9436}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Schema">
+      <UniqueIdentifier>{444b1f9c-41e3-4539-9033-86451600ab7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BigBang\cyberspace.cpp">
@@ -61,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="ENChart\permit.cpp">
       <Filter>ENChart</Filter>
+    </ClCompile>
+    <ClCompile Include="Schema\datahole.cpp">
+      <Filter>Schema</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
