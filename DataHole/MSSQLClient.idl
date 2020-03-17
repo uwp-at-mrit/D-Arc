@@ -1,0 +1,7 @@
+namespace WarGrey.DataHole {
+    [default_interface]
+    runtimeclass MSSQLClient {
+        MSSQLClient();
+        Int32 MyProperty;
+    }
+}
