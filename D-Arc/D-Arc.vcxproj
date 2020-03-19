@@ -284,7 +284,6 @@
     <ClCompile Include="D-Arc.cxx" />
     <ClCompile Include="Jargon\asnder.cpp" />
     <ClCompile Include="Jargon\mpint.cpp" />
-    <ClCompile Include="Schema\datahole.cpp" />
     <ClCompile Include="WormHole\mbtest.cpp" />
   </ItemGroup>
   <ItemGroup>
