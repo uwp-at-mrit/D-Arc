@@ -14,7 +14,6 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
 namespace WarGrey::Tamer::Jargon::Checksum {
-	/*********************************************************************************************/
 	private class IPv4 : public TestClass<IPv4> {
 	public:
 		TEST_METHOD(Break) {
@@ -27,16 +26,9 @@ namespace WarGrey::Tamer::Jargon::Checksum {
 				unsigned short acc_sum = 0;
 
 				if ((bidx & 0x01) == 1) {
-					unsigned int sum = checksum_ipv4(vector, bidx, count);
-					
-					sum = ((sum & 0xFF) << 8) ^ (sum >> 8); // swap 2nd part checksum
-					sum += checksum_ipv4(vector, 0, bidx);
-					
-					while (sum > 0xFFFFU) {
-						sum = (sum & 0xFFFFU) + (sum >> 16);
-					}
-
-					acc_sum = sum;
+					checksum_ipv4(&acc_sum, vector, bidx, count);
+					acc_sum = ((acc_sum & 0xFF) << 8) ^ (acc_sum >> 8); // swap 2nd part checksum
+					checksum_ipv4(&acc_sum, vector, 0, bidx);
 				} else {
 					checksum_ipv4(&acc_sum, vector, 0, bidx);
 					checksum_ipv4(&acc_sum, vector, bidx, count);
