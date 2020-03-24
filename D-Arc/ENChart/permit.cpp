@@ -3,8 +3,6 @@
 #include "crypto/enckey.hpp"
 #include "crypto/blowfish.hpp"
 
-#include "checksum/crc32.hpp"
-
 #include "datum/string.hpp"
 
 using namespace WarGrey::SCADA;
@@ -34,22 +32,6 @@ namespace WarGrey::Tamer::ENChart::Crypto {
 
 	private class ENCPrimitive : public TestClass<ENCPrimitive> {
 	public:
-		TEST_METHOD(CRC32) {
-			Assert::AreEqual("00000000", (char*)hexnumber(checksum_crc32(""), 4).c_str(), L"Empty Message");
-			Assert::AreEqual("414FA339", (char*)hexnumber(checksum_crc32("The quick brown fox jumps over the lazy dog"), 4).c_str(), L"rosettacode");
-			Assert::AreEqual(0x7E450C04UL, checksum_crc32("73871727080876A0"), L"S63 Data Protection Scheme(P12)");
-			Assert::AreEqual(780699093UL, checksum_crc32("NO4D061320000830BEB9BFE3C7C6CE68B16411FD09F96982"), L"S63 Data Protection Scheme(P50)");
-
-			{ // Accumulated CRC32
-				unsigned long acc_crc = 0;
-				
-				checksum_crc32(&acc_crc, "NO4D0613");
-				checksum_crc32(&acc_crc, "20000830");
-				
-				Assert::AreEqual(780699093UL, checksum_crc32(acc_crc, "BEB9BFE3C7C6CE68B16411FD09F96982"), L"Accumulated CRC32");
-			}
-		}
-
 		TEST_METHOD(ASCII) {
 			Assert::AreEqual("3130", (char*)enc_ascii(0x10U).c_str(), L"M_ID ASCII");
 			Assert::AreEqual("3132334142", (char*)enc_ascii(0x123ABU).c_str(), L"M_KEY ASCII");

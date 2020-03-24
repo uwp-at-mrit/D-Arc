@@ -62,6 +62,9 @@
     <ClCompile Include="ENChart\permit.cpp">
       <Filter>ENChart</Filter>
     </ClCompile>
+    <ClCompile Include="Jargon\chksum.cpp">
+      <Filter>Jargon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png">

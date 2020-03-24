@@ -283,6 +283,7 @@
     <ClCompile Include="Graphics\colorspace_convertion.cpp" />
     <ClCompile Include="D-Arc.cxx" />
     <ClCompile Include="Jargon\asnder.cpp" />
+    <ClCompile Include="Jargon\chksum.cpp" />
     <ClCompile Include="Jargon\mpint.cpp" />
     <ClCompile Include="WormHole\mbtest.cpp" />
   </ItemGroup>
