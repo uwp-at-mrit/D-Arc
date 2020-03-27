@@ -3,12 +3,12 @@
 #include "syslog.hpp"
 
 #ifdef _DEBUG
-static WarGrey::SCADA::Log default_logging_level = WarGrey::SCADA::Log::Debug;
+static WarGrey::GYDM::Log default_logging_level = WarGrey::GYDM::Log::Debug;
 #else
-static WarGrey::SCADA::Log default_logging_level = WarGrey::SCADA::Log::Info;
+static WarGrey::GYDM::Log default_logging_level = WarGrey::GYDM::Log::Info;
 #endif
 
-static WarGrey::SCADA::Log default_gps_logging_level = WarGrey::SCADA::Log::Info;
+static WarGrey::GYDM::Log default_gps_logging_level = WarGrey::GYDM::Log::Info;
 
 static Platform::String^ remote_test_server = "255.255.255.255";
 

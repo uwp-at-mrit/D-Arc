@@ -2,6 +2,7 @@
 #include "syslog.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::GYDM;
 using namespace WarGrey::Tamer;
 
 static const uint16 ninbit      = 0x16;

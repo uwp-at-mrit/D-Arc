@@ -10,6 +10,7 @@
 #include "BigBang/IHOS63TDS.hpp"
 
 using namespace WarGrey::SCADA;
+using namespace WarGrey::GYDM;
 using namespace WarGrey::Tamer;
 
 using namespace Windows::ApplicationModel;

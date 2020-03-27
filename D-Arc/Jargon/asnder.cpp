@@ -15,9 +15,6 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
 namespace WarGrey::Tamer::Jargon::ASN1 {
-	define_asn_enum(order, ASNOrder, zero, first, second, third, forth);
-	define_asn_enum(gender, ASNGender, unknown, male, female);
-
 	static size_t asn_utf_8_span(std::wstring& str) {
 		return asn_utf8_span(str);
 	}
@@ -42,34 +39,34 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 		return asn_octets_to_ia5(bint, offset);
 	}
 
-	static ASNOrder asn_bytes_to_order(octets& bint, size_t* offset = nullptr) {
-		return asn_octets_to_order(bint, offset);
+	static Log asn_bytes_to_log(octets& bint, size_t* offset = nullptr) {
+		return asn_octets_to_log(bint, offset);
 	}
 
-	private struct Person : public IASNSequence {
+	private struct LogMessage : public IASNSequence {
 	public:
-		Person(std::string& name, ASNGender gender, int age, double height)
-			: IASNSequence(4), name(name), gender(gender), age(age), height(height) {}
+		LogMessage(Log level, Platform::String^ message, long long timestamp, std::string topic)
+			: IASNSequence(4), level(level), message(message), timestamp(timestamp), topic(topic) {}
 
-		Person(octets& basn, size_t* offset = nullptr) : IASNSequence(4) {
+		LogMessage(octets& basn, size_t* offset = nullptr) : IASNSequence(4) {
 			this->from_octets(basn, offset);
 		}
 
 	public:
-		std::string name;
-		ASNGender gender;
-		int age;
-		double height;
+		Log level;
+		Platform::String^ message;
+		long long timestamp;
+		std::string topic;
 
 	protected:
 		size_t field_payload_span(size_t idx) override {
 			size_t span = 0;
 
 			switch (idx) {
-			case 0: span = asn_ia5_span(this->name); break;
-			case 1: span = asn_gender_span(this->gender); break;
-			case 2: span = asn_fixnum_span(this->age); break;
-			case 3: span = asn_real_span(this->height); break;
+			case 0: span = asn_log_span(this->level); break;
+			case 1: span = asn_utf8_span(this->message); break;
+			case 2: span = asn_fixnum_span(this->timestamp); break;
+			case 3: span = asn_ia5_span(this->topic); break;
 			}
 
 			return span;
@@ -77,10 +74,10 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 
 		size_t fill_field(size_t idx, uint8* octets, size_t offset) override {
 			switch (idx) {
-			case 0: offset = asn_ia5_into_octets(this->name, octets, offset); break;
-			case 1: offset = asn_gender_into_octets(this->gender, octets, offset); break;
-			case 2: offset = asn_fixnum_into_octets(this->age, octets, offset); break;
-			case 3: offset = asn_real_into_octets(this->height, octets, offset); break;
+			case 0: offset = asn_log_into_octets(this->level, octets, offset); break;
+			case 1: offset = asn_utf8_into_octets(this->message, octets, offset); break;
+			case 2: offset = asn_fixnum_into_octets(this->timestamp, octets, offset); break;
+			case 3: offset = asn_ia5_into_octets(this->topic, octets, offset); break;
 			}
 
 			return offset;
@@ -88,10 +85,10 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 
 		void extract_field(size_t idx, const uint8* basn, size_t* offset) override {
 			switch (idx) {
-			case 0: this->name = asn_octets_to_ia5(basn, offset); break;
-			case 1: this->gender = asn_octets_to_gender(basn, offset); break;
-			case 2: this->age = (int)(asn_octets_to_fixnum(basn, offset)); break;
-			case 3: this->height = asn_octets_to_real(basn, offset); break;
+			case 0: this->level = asn_octets_to_log(basn, offset); break;
+			case 1: this->message = make_wstring(asn_octets_to_utf8(basn, offset)); break;
+			case 2: this->timestamp = asn_octets_to_fixnum(basn, offset); break;
+			case 3: this->topic = asn_octets_to_ia5(basn, offset); break;
 			}
 		}
 	};
@@ -202,10 +199,10 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 		}
 
 		TEST_METHOD(Enumerated) {
-			const wchar_t* msgfmt = L"Enumerated Order [%s]";
+			const wchar_t* msgfmt = L"Enumerated Log [%s]";
 
-			test_enum(ASNOrder::zero,  asn_order_to_octets, asn_bytes_to_order, "\x0A\x01\x00", msgfmt);
-			test_enum(ASNOrder::forth, asn_order_to_octets, asn_bytes_to_order, "\x0A\x01\x04", msgfmt);
+			test_enum(Log::Debug,  asn_log_to_octets, asn_bytes_to_log, "\x0A\x01\x00", msgfmt);
+			test_enum(Log::Error, asn_log_to_octets, asn_bytes_to_log, "\x0A\x01\x04", msgfmt);
 		}
 
 		TEST_METHOD(String) {
@@ -310,27 +307,27 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 	private class DERSequence : public TestClass<DERSequence> {
 	public:
 		TEST_METHOD(PlainSequence) {
-			Person person(std::string("Smith"), ASNGender::male, 42, 180.0);
+			LogMessage log_msg(Log::Debug, "测试", 1585280242148LL, "tamer");
 
-			test_person(person, "\x30\x13\x16\x05\x53\x6d\x69\x74\x68\x0a\x01\x01\x02\x01\x2a\x09\x04\x80\x00\x00\xb4");
+			test_sequence(log_msg, "\x30\x1a\x0a\x01\x00\x0c\x06\xe6\xb5\x8b\xe8\xaf\x95\x02\x06\x01\x71\x1a\x10\xd1\xe4\x16\x05\x74\x61\x6d\x65\x72");
 		}
 
 	private:
-		void test_person(Person& p, const char* representation) {
-			Platform::String^ message = make_wstring(L"%S", p.name.c_str());
-			octets basn = p.to_octets();
+		void test_sequence(LogMessage& m, const char* representation) {
+			Platform::String^ name = make_wstring(m.topic.c_str());
+			octets basn = m.to_octets();
 			
-			Assert::IsTrue(bytes_eq(representation, basn.c_str(), basn.size(), message), message->Data());
-			Assert::AreEqual(asn_span(&p), basn.size(), make_wstring(L"%S span", p.name.c_str())->Data());
+			Assert::IsTrue(bytes_eq(representation, basn.c_str(), basn.size(), name), name->Data());
+			Assert::AreEqual(asn_span(&m), basn.size(), make_wstring(L"%s span", name->Data())->Data());
 
 			{ // decode
 				size_t offset = 0;
-				Person restored(basn, &offset);
+				LogMessage restored(basn, &offset);
 
-				Assert::AreEqual(p.name.c_str(), restored.name.c_str(), make_wstring(L"%S name", p.name.c_str())->Data());
-				Assert::IsTrue(p.gender == restored.gender, make_wstring(L"%S gender", p.name.c_str())->Data());
-				Assert::AreEqual(p.age, restored.age, make_wstring(L"%S age", p.name.c_str())->Data());
-				Assert::AreEqual(p.height, restored.height, make_wstring(L"%S height", p.name.c_str())->Data());
+				Assert::IsTrue(m.level == restored.level, make_wstring(L"%s topic", name->Data())->Data());
+				Assert::IsTrue(m.message->Equals(restored.message), make_wstring(L"%s message", name->Data())->Data());
+				Assert::AreEqual(m.timestamp, restored.timestamp, make_wstring(L"%s timestamp", name->Data())->Data());
+				Assert::AreEqual(m.topic.c_str(), restored.topic.c_str(), make_wstring(L"%s topic", name->Data())->Data());
 			}
 		}
 	};
