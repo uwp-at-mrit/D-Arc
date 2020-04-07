@@ -10,7 +10,8 @@ static WarGrey::GYDM::Log default_logging_level = WarGrey::GYDM::Log::Info;
 
 static WarGrey::GYDM::Log default_gps_logging_level = WarGrey::GYDM::Log::Info;
 
-static Platform::String^ remote_test_server = "255.255.255.255";
+static Platform::String^ rsyslog_host = "239.255.203.113";
+static unsigned short rsyslog_port = 1618;
 
 /*************************************************************************************************/
 static const unsigned int frame_per_second = 5U;

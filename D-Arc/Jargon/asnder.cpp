@@ -15,6 +15,8 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 /*************************************************************************************************/
 namespace WarGrey::Tamer::Jargon::ASN1 {
+	define_asn_enum(log, Log, Debug, Info, Notice, Warning, Error, Critical, Alarm, Panic, _ );
+
 	static size_t asn_utf_8_span(std::wstring& str) {
 		return asn_utf8_span(str);
 	}
@@ -106,10 +108,10 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 		}
 
 		if (!eq) {
-			syslog(Log::Error, L"BytesEq: %s:", message->Data());
+			syslog(::Log::Error, L"BytesEq: %s:", message->Data());
 
 			for (size_t i = 0; i < size; i++) {
-				syslog(Log::Error, L"  [%02d] exptected: %02X, given: %02X", i, b1[i], b2[i]);
+				syslog(::Log::Error, L"  [%02d] exptected: %02X, given: %02X", i, b1[i], b2[i]);
 			}
 		}
 

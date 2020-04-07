@@ -135,5 +135,5 @@ private:
 };
 
 int main(Platform::Array<Platform::String^>^ args) {
-	return launch_universal_windows_application<DArcApplication>(default_logging_level, remote_test_server);
+	return launch_universal_windows_application<DArcApplication>(default_logging_level, rsyslog_host, rsyslog_port);
 }

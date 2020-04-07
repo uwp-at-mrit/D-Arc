@@ -2,6 +2,7 @@
 
 #include "datum/natural.hpp"
 #include "datum/string.hpp"
+#include "datum/fixnum.hpp"
 
 using namespace WarGrey::SCADA;
 using namespace WarGrey::GYDM;
@@ -454,6 +455,18 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 			for (size_t idx = 0; idx < 33; idx++) {
 				assert(FFABCD.bit_field(idx, 32), Natural((x >> idx) & ((1ULL << (32ULL - idx)) - 1ULL)),
 					make_wstring(L"(bitwise-bit-field #x%S %d 32)", FFABCD.to_hexstring().c_str(), idx));
+			}
+		}
+
+		TEST_METHOD(Binstring) {
+			uint64 ns[] = { 0x0ULL, 0x5ULL, 0x1010ULL, 0xFE110ULL, 0xEC0000412ULL };
+
+			for (size_t idx = 0; idx < sizeof(ns) / sizeof(uint64); idx++) {
+				Natural N(ns[idx]);
+				int binsize = fxmax(int(N.length() * 8U), 8);
+
+				Assert::AreEqual((const char*)binumber(ns[idx], size_t(binsize)).c_str(), (const char*)N.to_binstring().c_str(),
+					make_wstring(L"%llX.to_binstring()", ns[idx])->Data());
 			}
 		}
 
