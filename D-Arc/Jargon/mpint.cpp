@@ -465,7 +465,7 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 				Natural N(ns[idx]);
 				int binsize = fxmax(int(N.length() * 8U), 8);
 
-				Assert::AreEqual((const char*)binumber(ns[idx], size_t(binsize)).c_str(), (const char*)N.to_binstring().c_str(),
+				Assert::AreEqual((const char*)binumber(ns[idx], size_t(binsize)).c_str(), (const char*)N.to_binstring(8).c_str(),
 					make_wstring(L"%llX.to_binstring()", ns[idx])->Data());
 			}
 		}
