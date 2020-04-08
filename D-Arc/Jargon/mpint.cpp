@@ -446,15 +446,27 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 
 		TEST_METHOD(Bitfield) {
 			unsigned long long x = 0xFFABCDU;
+			unsigned long long ull = 32ULL;
 			Natural FFABCD(x);
 
-			assert(Natural(13).bit_field(1, 1), Natural(0U), "(bitwise-bit-field 13 1 1)");
-			assert(Natural(13).bit_field(1, 3), Natural(2U), "(bitwise-bit-field 13 1 3)");
-			assert(Natural(13).bit_field(1, 4), Natural(6U), "(bitwise-bit-field 13 1 4)");
+			assert(Natural(13).bit_field(1, 1), Natural(0U), "Natural: (bitwise-bit-field 13 1 1)");
+			assert(Natural(13).bit_field(1, 3), Natural(2U), "Natural: (bitwise-bit-field 13 1 3)");
+			assert(Natural(13).bit_field(1, 4), Natural(6U), "Natural: (bitwise-bit-field 13 1 4)");
 
-			for (size_t idx = 0; idx < 33; idx++) {
-				assert(FFABCD.bit_field(idx, 32), Natural((x >> idx) & ((1ULL << (32ULL - idx)) - 1ULL)),
-					make_wstring(L"(bitwise-bit-field #x%S %d 32)", FFABCD.to_hexstring().c_str(), idx));
+			Assert::AreEqual(Natural(13).bitfield(1, 1), 0ULL, L"uint64: (bitwise-bit-field 13 1 1)");
+			Assert::AreEqual(Natural(13).bitfield(1, 3), 2ULL, L"uint64: (bitwise-bit-field 13 1 3)");
+			Assert::AreEqual(Natural(13).bitfield(1, 4), 6ULL, L"uint64: (bitwise-bit-field 13 1 4)");
+
+			for (size_t idx = 0; idx <= ull; idx++) {
+				unsigned long long expected = (x >> idx) & ((1ULL << (ull - idx)) - 1ULL);
+
+				assert(FFABCD.bit_field(idx, ull), Natural(expected),
+					make_wstring(L"Natural: (bitwise-bit-field #x%S %d 32)",
+						FFABCD.to_hexstring().c_str(), idx));
+
+				Assert::AreEqual(FFABCD.bitfield(idx, ull), expected,
+					make_wstring(L"uint64: (bitwise-bit-field #x%S %d 32)",
+						FFABCD.to_hexstring().c_str(), idx)->Data());
 			}
 		}
 
