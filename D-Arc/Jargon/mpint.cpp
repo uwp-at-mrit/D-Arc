@@ -470,6 +470,14 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 			}
 		}
 
+		TEST_METHOD(Signed_Bitfield) {
+			Natural n(0b110111);
+			
+			Assert::AreEqual(0b111LL, n.signed_bitfield(0, 4), L"signed bitfield(0111)");
+			Assert::AreEqual(-1LL, n.signed_bitfield(0, 3), L"signed bitfield(111)");
+			Assert::AreEqual(-2LL, n.signed_bitfield(3, 6), L"signed bitfield(110)");
+		}
+
 		TEST_METHOD(Binstring) {
 			uint64 ns[] = { 0x0ULL, 0x5ULL, 0x1010ULL, 0xFE110ULL, 0xEC0000412ULL };
 
