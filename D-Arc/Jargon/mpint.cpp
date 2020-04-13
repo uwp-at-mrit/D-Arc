@@ -446,7 +446,7 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 
 		TEST_METHOD(Bitfield) {
 			unsigned long long x = 0xFFABCDU;
-			unsigned long long ull = 32ULL;
+			unsigned long long ull = 31ULL;
 			Natural FFABCD(x);
 
 			assert(Natural(13).bit_field(1, 1), Natural(0U), "Natural: (bitwise-bit-field 13 1 1)");
