@@ -447,15 +447,21 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 		TEST_METHOD(Bitfield) {
 			unsigned long long x = 0xFFABCDU;
 			unsigned long long ull = 31ULL;
-			Natural FFABCD(x);
+			Natural FFABCD(x), n13(13), n55(0b110111);
 
-			assert(Natural(13).bit_field(1, 1), Natural(0U), "Natural: (bitwise-bit-field 13 1 1)");
-			assert(Natural(13).bit_field(1, 3), Natural(2U), "Natural: (bitwise-bit-field 13 1 3)");
-			assert(Natural(13).bit_field(1, 4), Natural(6U), "Natural: (bitwise-bit-field 13 1 4)");
-
-			Assert::AreEqual(Natural(13).bitfield(1, 1), 0ULL, L"uint64: (bitwise-bit-field 13 1 1)");
-			Assert::AreEqual(Natural(13).bitfield(1, 3), 2ULL, L"uint64: (bitwise-bit-field 13 1 3)");
-			Assert::AreEqual(Natural(13).bitfield(1, 4), 6ULL, L"uint64: (bitwise-bit-field 13 1 4)");
+			assert(n13.bit_field(1, 1), Natural(0U), "Natural: (bitwise-bit-field 13 1 1)");
+			assert(n13.bit_field(1, 3), Natural(2U), "Natural: (bitwise-bit-field 13 1 3)");
+			assert(n13.bit_field(1, 4), Natural(6U), "Natural: (bitwise-bit-field 13 1 4)");
+			assert(n55.bit_field(0, 4), Natural(0b111U), "Natural: (bitwise-bit-field 55 0 4)");
+			assert(n55.bit_field(0, 3), Natural(0b111U), "Natural: (bitwise-bit-field 55 0 3)");
+			assert(n55.bit_field(3, 6), Natural(0b110U), "Natural: (bitwise-bit-field 55 3 6)");
+			
+			Assert::AreEqual(0ULL, n13.bitfield(1, 1), L"uint64: (bitwise-bit-field 13 1 1)");
+			Assert::AreEqual(2ULL, n13.bitfield(1, 3), L"uint64: (bitwise-bit-field 13 1 3)");
+			Assert::AreEqual(6ULL, n13.bitfield(1, 4), L"uint64: (bitwise-bit-field 13 1 4)");
+			Assert::AreEqual(0b111ULL, n55.bitfield(0, 4), L"uint64: (bitwise-bit-field 55 0 4)");
+			Assert::AreEqual(0b111ULL, n55.bitfield(0, 3), L"uint64: (bitwise-bit-field 55 0 3)");
+			Assert::AreEqual(0b110ULL, n55.bitfield(3, 6), L"uint64: (bitwise-bit-field 55 3 6)");
 
 			for (size_t idx = 0; idx <= ull; idx++) {
 				unsigned long long expected = (x >> idx) & ((1ULL << (ull - idx)) - 1ULL);
@@ -464,16 +470,36 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 					make_wstring(L"Natural: (bitwise-bit-field #x%S %d 32)",
 						FFABCD.to_hexstring().c_str(), idx));
 
-				Assert::AreEqual(FFABCD.bitfield(idx, ull), expected,
-					make_wstring(L"uint64: (bitwise-bit-field #x%S %d 32)",
-						FFABCD.to_hexstring().c_str(), idx)->Data());
+				Assert::AreEqual(expected, FFABCD.bitfield(idx, ull), 
+					make_wstring(L"uint64: (bitwise-bit-field #x%S %d %d)",
+						FFABCD.to_hexstring().c_str(), idx, ull)->Data());
+			}
+
+			{ // AIS Class A Position Report Messages
+				unsigned long long headings[] = { 511U, 312U, 69U, 511U, 511U, 278U, 511U, 511U, 144U, 277U, 278U, 319U };
+				Platform::String^ positions[] = {
+					"046293A2D1600339F9A6040C0F3B5504FFB40883FD", "0C625697A0000181F963850C17BCDC2A9C38002170", "0C6256A588400011FB2A3C8BCDEB287822B6000000",
+					"046255F188200501FB78608C0F84E30CFFB60008FD", "04629506E8600009FA5BB00BFFF219DDFFB600C01D", "0462850A40FF0739FA75F18C0B1C6AC68B38004E04",
+					"04628D6529603FF33C8D603412140E10FF80024000", "046292EFE8600001FA65D20C013E5603FFB9888422", "0462901F48E00479FB1B3E0BF749A6204838014011",
+					"0C623E0A782040D9F969320C1C2EE1348A9C020E20", "0462850A40FF4739FA75E08C0B1C9AC68B3A004E04", "04629550FBC00001FA6F8C0C098426CF9FB602843F"
+				};
+
+				for (size_t idx = 0; idx < sizeof(headings) / sizeof(unsigned long long); idx++) {
+					unsigned long long heading = headings[idx];
+					Natural ais(16, positions[idx]);
+					size_t start = 31;
+					size_t end = 40;
+
+					Assert::AreEqual(heading, ais.bitfield(start, end), make_wstring(L"uint64: AIS Heading: %d: %s", idx, positions[idx]->Data())->Data());
+					assert(ais.bit_field(start, end), Natural(heading), make_wstring(L"Natural: AIS Heading: %d: %s", idx, positions[idx]->Data()));
+				}
 			}
 		}
 
 		TEST_METHOD(Signed_Bitfield) {
 			Natural n(0b110111);
 			
-			Assert::AreEqual(0b111LL, n.signed_bitfield(0, 4), L"signed bitfield(0111)");
+			Assert::AreEqual(0b0111LL, n.signed_bitfield(0, 4), L"signed bitfield(0111)");
 			Assert::AreEqual(-1LL, n.signed_bitfield(0, 3), L"signed bitfield(111)");
 			Assert::AreEqual(-2LL, n.signed_bitfield(3, 6), L"signed bitfield(110)");
 		}
