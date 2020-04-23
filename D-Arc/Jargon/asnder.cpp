@@ -309,7 +309,7 @@ namespace WarGrey::Tamer::Jargon::ASN1 {
 	private class DERSequence : public TestClass<DERSequence> {
 	public:
 		TEST_METHOD(PlainSequence) {
-			LogMessage log_msg(Log::Debug, "测试", 1585280242148LL, "tamer");
+			LogMessage log_msg(Log::Debug, L"测试", 1585280242148LL, "tamer");
 
 			test_sequence(log_msg, "\x30\x1a\x0a\x01\x00\x0c\x06\xe6\xb5\x8b\xe8\xaf\x95\x02\x06\x01\x71\x1a\x10\xd1\xe4\x16\x05\x74\x61\x6d\x65\x72");
 		}
