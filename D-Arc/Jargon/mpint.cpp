@@ -467,8 +467,8 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 				unsigned long long expected = (x >> idx) & ((1ULL << (ull - idx)) - 1ULL);
 
 				assert(FFABCD.bit_field(idx, ull), Natural(expected),
-					make_wstring(L"Natural: (bitwise-bit-field #x%S %d 32)",
-						FFABCD.to_hexstring().c_str(), idx));
+					make_wstring(L"Natural: (bitwise-bit-field #x%S %d %d)",
+						FFABCD.to_hexstring().c_str(), idx, ull));
 
 				Assert::AreEqual(expected, FFABCD.bitfield(idx, ull), 
 					make_wstring(L"uint64: (bitwise-bit-field #x%S %d %d)",
@@ -476,22 +476,31 @@ namespace WarGrey::Tamer::Jargon::MPNatural {
 			}
 
 			{ // AIS Class A Position Report Messages
-				unsigned long long headings[] = { 511U, 312U, 69U, 511U, 511U, 278U, 511U, 511U, 144U, 277U, 278U, 319U };
 				Platform::String^ positions[] = {
 					"046293A2D1600339F9A6040C0F3B5504FFB40883FD", "0C625697A0000181F963850C17BCDC2A9C38002170", "0C6256A588400011FB2A3C8BCDEB287822B6000000",
 					"046255F188200501FB78608C0F84E30CFFB60008FD", "04629506E8600009FA5BB00BFFF219DDFFB600C01D", "0462850A40FF0739FA75F18C0B1C6AC68B38004E04",
 					"04628D6529603FF33C8D603412140E10FF80024000", "046292EFE8600001FA65D20C013E5603FFB9888422", "0462901F48E00479FB1B3E0BF749A6204838014011",
 					"0C623E0A782040D9F969320C1C2EE1348A9C020E20", "0462850A40FF4739FA75E08C0B1C9AC68B3A004E04", "04629550FBC00001FA6F8C0C098426CF9FB602843F"
 				};
+				unsigned long long headings[] = { 511U, 312U, 69U, 511U, 511U, 278U, 511U, 511U, 144U, 277U, 278U, 319U };
+				unsigned long long longitudes[] = { 66276360, 66242314, 66475129, 66515137, 66369376, 66382819, 108600000, 66374564, 66467452, 66245220, 66382785, 66379544 };
+				unsigned long long latitudes[] = { 12645301, 12680141, 12377778, 12646478, 12582689, 12628422, 54600000, 12588005, 12547226, 12698350, 12628425, 12621890 };
 
 				for (size_t idx = 0; idx < sizeof(headings) / sizeof(unsigned long long); idx++) {
-					unsigned long long heading = headings[idx];
+					unsigned long long hea = headings[idx], lon = longitudes[idx], lat = latitudes[idx];
 					Natural ais(16, positions[idx]);
-					size_t start = 31;
-					size_t end = 40;
+					size_t hea_start = 31, hea_end = 40;
+					size_t lat_start = 52, lat_end = 79;
+					size_t lon_start = 79, lon_end = 107;
 
-					Assert::AreEqual(heading, ais.bitfield(start, end), make_wstring(L"uint64: AIS Heading: %d: %s", idx, positions[idx]->Data())->Data());
-					assert(ais.bit_field(start, end), Natural(heading), make_wstring(L"Natural: AIS Heading: %d: %s", idx, positions[idx]->Data()));
+					//Assert::AreEqual(hea, ais.bitfield(hea_start, hea_end), make_wstring(L"uint64: AIS Heading: %d: %s", idx, positions[idx]->Data())->Data());
+					assert(ais.bit_field(hea_start, hea_end), Natural(hea), make_wstring(L"Natural: AIS Heading: %d: %s", idx, positions[idx]->Data()));
+
+					//Assert::AreEqual(lat, ais.bitfield(lat_start, lat_end), make_wstring(L"uint64: AIS Latitude: %d: %s", idx, positions[idx]->Data())->Data());
+					assert(ais.bit_field(lat_start, lat_end), Natural(lat), make_wstring(L"Natural: AIS Latitude: %d: %s", idx, positions[idx]->Data()));
+
+					//Assert::AreEqual(lon, ais.bitfield(lon_start, lon_end), make_wstring(L"uint64: AIS Longitude: %d: %s", idx, positions[idx]->Data())->Data());
+					assert(ais.bit_field(lon_start, lon_end), Natural(lon), make_wstring(L"Natural: AIS Longitude: %d: %s", idx, positions[idx]->Data()));
 				}
 			}
 		}
